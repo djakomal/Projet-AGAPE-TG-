@@ -1,0 +1,375 @@
+<div class="container-fluid">
+  <!-- En-tête -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">
+            <i class="bi bi-graph-up me-2"></i>
+            Rapports Financiers
+          </h4>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3">
+              <label class="form-label">Année</label>
+              <select class="form-select" [(ngModel)]="anneeSelectionnee" (change)="refresh()">
+                <option *ngFor="let annee of [2023, 2024, 2025]" [value]="annee">{{ annee }}</option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Mois</label>
+              <select class="form-select" [(ngModel)]="moisSelectionne" (change)="refresh()">
+                <option *ngFor="let mois of [1,2,3,4,5,6,7,8,9,10,11,12]; let i = index" [value]="mois">
+                  {{ ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'][i] }}
+                </option>
+              </select>
+            </div>
+            <div class="col-md-3">
+              <label class="form-label">Type de rapport</label>
+              <select class="form-select" [(ngModel)]="typeRapport">
+                <option value="global">Rapport Global</option>
+                <option value="mensuel">Rapport Mensuel</option>
+                <option value="annuel">Rapport Annuel</option>
+              </select>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <button class="btn btn-primary me-2" (click)="genererRapport(typeRapport)">
+                <i class="bi bi-file-earmark-text me-1"></i>
+                Générer
+              </button>
+              <button class="btn btn-success me-2" (click)="imprimerRapport()">
+                <i class="bi bi-printer me-1"></i>
+                Imprimer
+              </button>
+              <button class="btn btn-info" (click)="exporterPDF()">
+                <i class="bi bi-file-pdf me-1"></i>
+                PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alertes -->
+  <div class="row mb-4" *ngIf="getAlertes().length > 0">
+    <div class="col-12">
+      <div class="alert alert-warning" *ngFor="let alerte of getAlertes()">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        {{ alerte.message }}
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-primary">{{ formatMontant(totalBudget) }}</h3>
+          <small>Budget Total</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-success">{{ formatMontant(totalEntrees) }}</h3>
+          <small>Total Entrées</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-danger">{{ formatMontant(totalSorties) }}</h3>
+          <small>Total Sorties</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 [class]="solde >= 0 ? 'text-success' : 'text-danger'">{{ formatMontant(solde) }}</h3>
+          <small>Solde</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rapport Global -->
+  <div class="row mb-4" *ngIf="typeRapport === 'global' && rapportFinancier">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-file-earmark-text me-2"></i>
+            Rapport Financier Global - {{ rapportFinancier.periode }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Résumé Global</h6>
+              <table class="table table-sm">
+                <tr>
+                  <td>Total Entrées:</td>
+                  <td class="text-success fw-bold">{{ formatMontant(rapportFinancier.totalEntrees) }}</td>
+                </tr>
+                <tr>
+                  <td>Total Sorties:</td>
+                  <td class="text-danger fw-bold">{{ formatMontant(rapportFinancier.totalSorties) }}</td>
+                </tr>
+                <tr>
+                  <td>Solde:</td>
+                  <td [class]="rapportFinancier.solde >= 0 ? 'text-success fw-bold' : 'text-danger fw-bold'">
+                    {{ formatMontant(rapportFinancier.solde) }}
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <h6>Détails par Catégorie</h6>
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Catégorie</th>
+                      <th>Budget</th>
+                      <th>Dépenses</th>
+                      <th>Reste</th>
+                      <th>%</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let categorie of ['scolarite', 'sante', 'nutrition', 'transport', 'administration', 'autres']">
+                      <td [class]="getCategorieClass(categorie)">{{ categorie | titlecase }}</td>
+                      <td>{{ formatMontant(getDetailCategorie(categorie, 'budget')) }}</td>
+                      <td>{{ formatMontant(getDetailCategorie(categorie, 'depenses')) }}</td>
+                      <td>{{ formatMontant(getDetailCategorie(categorie, 'reste')) }}</td>
+                      <td [class]="getTauxUtilisationClass(detailsParCategorie[categorie]?.tauxUtilisation || 0)">
+                        {{ detailsParCategorie[categorie]?.tauxUtilisation || 0 }}%
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rapport Mensuel -->
+  <div class="row mb-4" *ngIf="typeRapport === 'mensuel' && rapportMensuel">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-calendar-month me-2"></i>
+            Rapport Mensuel - {{ rapportMensuel.mois }} {{ rapportMensuel.annee }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Résumé Mensuel</h6>
+              <table class="table table-sm">
+                <tr>
+                  <td>Budget Total:</td>
+                  <td class="text-primary fw-bold">{{ formatMontant(rapportMensuel.budgetTotal) }}</td>
+                </tr>
+                <tr>
+                  <td>Dépenses Total:</td>
+                  <td class="text-danger fw-bold">{{ formatMontant(rapportMensuel.depensesTotal) }}</td>
+                </tr>
+                <tr>
+                  <td>Entrées:</td>
+                  <td class="text-success fw-bold">{{ formatMontant(rapportMensuel.entreesTotal) }}</td>
+                </tr>
+                <tr>
+                  <td>Sorties:</td>
+                  <td class="text-danger fw-bold">{{ formatMontant(rapportMensuel.sortiesTotal) }}</td>
+                </tr>
+                <tr>
+                  <td>Solde:</td>
+                  <td [class]="rapportMensuel.solde >= 0 ? 'text-success fw-bold' : 'text-danger fw-bold'">
+                    {{ formatMontant(rapportMensuel.solde) }}
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <h6>Détails par Catégorie</h6>
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Catégorie</th>
+                      <th>Budget</th>
+                      <th>Dépenses</th>
+                      <th>Reste</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let categorie of ['scolarite', 'sante', 'nutrition', 'transport', 'administration', 'autres']">
+                      <td [class]="getCategorieClass(categorie)">{{ categorie | titlecase }}</td>
+                      <td>{{ formatMontant(rapportMensuel.details[categorie].budget) }}</td>
+                      <td>{{ formatMontant(rapportMensuel.details[categorie].depenses) }}</td>
+                      <td>{{ formatMontant(rapportMensuel.details[categorie].reste) }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rapport Annuel -->
+  <div class="row mb-4" *ngIf="typeRapport === 'annuel' && rapportAnnuel">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-calendar-year me-2"></i>
+            Rapport Annuel - {{ rapportAnnuel.annee }}
+          </h5>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-6">
+              <h6>Résumé Annuel</h6>
+              <table class="table table-sm">
+                <tr>
+                  <td>Budget Total:</td>
+                  <td class="text-primary fw-bold">{{ formatMontant(rapportAnnuel.budgetTotal) }}</td>
+                </tr>
+                <tr>
+                  <td>Dépenses Total:</td>
+                  <td class="text-danger fw-bold">{{ formatMontant(rapportAnnuel.depensesTotal) }}</td>
+                </tr>
+                <tr>
+                  <td>Entrées:</td>
+                  <td class="text-success fw-bold">{{ formatMontant(rapportAnnuel.entreesTotal) }}</td>
+                </tr>
+                <tr>
+                  <td>Sorties:</td>
+                  <td class="text-danger fw-bold">{{ formatMontant(rapportAnnuel.sortiesTotal) }}</td>
+                </tr>
+                <tr>
+                  <td>Solde:</td>
+                  <td [class]="rapportAnnuel.solde >= 0 ? 'text-success fw-bold' : 'text-danger fw-bold'">
+                    {{ formatMontant(rapportAnnuel.solde) }}
+                  </td>
+                </tr>
+              </table>
+            </div>
+            <div class="col-md-6">
+              <h6>Évolution Mensuelle</h6>
+              <div class="table-responsive">
+                <table class="table table-sm">
+                  <thead>
+                    <tr>
+                      <th>Mois</th>
+                      <th>Budget</th>
+                      <th>Dépenses</th>
+                      <th>Reste</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let evolution of rapportAnnuel.evolutionMensuelle">
+                      <td>{{ ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sep', 'Oct', 'Nov', 'Déc'][evolution.mois - 1] }}</td>
+                      <td>{{ formatMontant(evolution.budget) }}</td>
+                      <td>{{ formatMontant(evolution.depenses) }}</td>
+                      <td [class]="evolution.reste >= 0 ? 'text-success' : 'text-danger'">
+                        {{ formatMontant(evolution.reste) }}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphiques et Statistiques -->
+  <div class="row mb-4">
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="bi bi-pie-chart me-2"></i>
+            Répartition des Dépenses par Catégorie
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="graph-container">
+            <div class="text-center">
+              <i class="bi bi-pie-chart display-4 text-muted"></i>
+              <p class="mt-2">Graphique de répartition</p>
+              <small class="text-muted">Simulation de graphique</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="bi bi-graph-up me-2"></i>
+            Évolution des Dépenses
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="graph-container">
+            <div class="text-center">
+              <i class="bi bi-graph-up display-4 text-muted"></i>
+              <p class="mt-2">Graphique d'évolution</p>
+              <small class="text-muted">Simulation de graphique</small>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header">
+          <h6 class="mb-0">
+            <i class="bi bi-download me-2"></i>
+            Actions
+          </h6>
+        </div>
+        <div class="card-body">
+          <div class="btn-group" role="group">
+            <button class="btn btn-outline-primary" (click)="telechargerRapport()">
+              <i class="bi bi-download me-1"></i>
+              Télécharger TXT
+            </button>
+            <button class="btn btn-outline-success" (click)="exporterPDF()">
+              <i class="bi bi-file-pdf me-1"></i>
+              Exporter PDF
+            </button>
+            <button class="btn btn-outline-info" (click)="imprimerRapport()">
+              <i class="bi bi-printer me-1"></i>
+              Imprimer
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

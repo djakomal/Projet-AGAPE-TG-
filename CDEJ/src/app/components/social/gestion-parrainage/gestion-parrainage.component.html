@@ -1,0 +1,151 @@
+<div class="row mb-3 align-items-center">
+  <div class="col-md-6">
+    <h4 class="fw-bold text-primary mb-0"><i class="bi bi-people-fill me-2"></i>Gestion du Parrainage</h4>
+  </div>
+  <div class="col-md-6">
+    <div class="d-flex justify-content-end align-items-center gap-2">
+      <button class="btn btn-outline-primary btn-sm" (click)="imprimerParrainage()">
+        <i class="bi bi-printer me-1"></i>Imprimer
+      </button>
+      <button class="btn btn-outline-info btn-sm" (click)="exporterPDF()">
+        <i class="bi bi-file-pdf me-1"></i>Export PDF
+      </button>
+      <button class="btn btn-outline-success btn-sm" (click)="genererRapport()">
+        <i class="bi bi-file-text me-1"></i>Générer Rapport
+      </button>
+      <form class="row g-2 justify-content-end align-items-end" (ngSubmit)="addParrain()">
+        <div class="col-auto">
+          <input class="form-control" [(ngModel)]="newParrain.nom" name="parrainNom" placeholder="Nom du parrain" required />
+        </div>
+        <div class="col-auto">
+          <input class="form-control" [(ngModel)]="newParrain.contact" name="parrainContact" placeholder="Contact" required />
+        </div>
+        <div class="col-auto">
+          <button type="submit" class="btn btn-success"><i class="bi bi-person-plus"></i> Ajouter un parrain</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="row g-3">
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-header bg-success text-white d-flex align-items-center justify-content-between">
+        <span><i class="bi bi-person-check-fill me-2"></i>Enfants parrainés</span>
+        <span class="badge bg-light text-success">{{ enfantsParraines.length }}</span>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-success">
+            <tr>
+              <th>Numéro</th>
+              <th>Nom</th>
+              <th>Prénom</th>
+              <th>Parrain</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let enfant of enfantsParraines" class="table-row-hover">
+              <td><span class="badge bg-primary">{{ enfant.numero }}</span></td>
+              <td class="fw-bold">{{ enfant.nom }}</td>
+              <td>{{ enfant.prenom }}</td>
+              <td>
+                <span *ngIf="getParrain(enfant.parrainId)">
+                  <i class="bi bi-person-heart me-1 text-success"></i>{{ getParrain(enfant.parrainId)?.nom }}<br>
+                  <small class="text-muted"><i class="bi bi-envelope-at"></i> {{ getParrain(enfant.parrainId)?.contact }}</small>
+                </span>
+                <span *ngIf="!getParrain(enfant.parrainId)">-</span>
+              </td>
+              <td>
+                <button class="btn btn-outline-warning btn-sm me-1" (click)="retirerParrain(enfant)" title="Retirer le parrain"><i class="bi bi-x-circle"></i></button>
+                <button class="btn btn-outline-info btn-sm" (click)="showHistorique(enfant)" title="Historique"><i class="bi bi-clock-history"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Historique lettres/cadeaux -->
+      <div *ngIf="historiqueEnfant" class="card-body border-top bg-light mt-2 rounded-bottom">
+        <button class="btn-close float-end" (click)="hideHistorique()" title="Fermer"></button>
+        <h6 class="fw-bold mb-3">Historique de l'enfant <span class="badge bg-primary">{{ historiqueEnfant.numero }}</span></h6>
+        <div class="mb-2">
+          <strong><i class="bi bi-envelope-paper"></i> Lettres reçues :</strong>
+          <ul class="mb-2">
+            <li *ngFor="let lettre of lettres"><i class="bi bi-envelope-open me-1"></i>Lettre du {{ lettre.date | date:'dd/MM/yyyy' }} <span class="badge bg-secondary ms-2">{{ lettre.statut }}</span></li>
+            <li *ngIf="lettres.length === 0" class="text-muted">Aucune lettre</li>
+          </ul>
+        </div>
+        <div class="mb-2">
+          <strong><i class="bi bi-gift"></i> Cadeaux reçus :</strong>
+          <ul class="mb-2">
+            <li *ngFor="let gift of gifts"><i class="bi bi-gift-fill me-1 text-danger"></i>{{ gift.description }} <span class="text-muted">({{ gift.date | date:'dd/MM/yyyy' }})</span></li>
+            <li *ngIf="gifts.length === 0" class="text-muted">Aucun cadeau</li>
+          </ul>
+        </div>
+        <form class="row g-2 align-items-end" (ngSubmit)="addGift(historiqueEnfant, historiqueEnfant.parrainId!)">
+          <div class="col-md-8">
+            <input class="form-control" [(ngModel)]="newGiftDesc" name="giftDesc" placeholder="Ajouter un cadeau..." required />
+          </div>
+          <div class="col-md-4">
+            <button type="submit" class="btn btn-success w-100"><i class="bi bi-plus-circle"></i> Ajouter le cadeau</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6">
+    <div class="card shadow-sm border-0 mb-4">
+      <div class="card-header bg-secondary text-white d-flex align-items-center justify-content-between">
+        <span><i class="bi bi-person-dash-fill me-2"></i>Enfants non parrainés</span>
+        <span class="badge bg-light text-secondary">{{ enfantsNonParraines.length }}</span>
+      </div>
+      <div class="card-body p-0">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="table-secondary">
+            <tr>
+              <th>Numéro</th>
+              <th>Nom</th>
+              <th>Prénom</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let enfant of enfantsNonParraines" class="table-row-hover">
+              <td><span class="badge bg-primary">{{ enfant.numero }}</span></td>
+              <td class="fw-bold">{{ enfant.nom }}</td>
+              <td>{{ enfant.prenom }}</td>
+              <td>
+                <button class="btn btn-outline-primary btn-sm" (click)="selectEnfant(enfant)" title="Attribuer un parrain"><i class="bi bi-person-plus"></i></button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Attribution d'un parrain -->
+<div *ngIf="selectedEnfant" class="card shadow-sm border-0 mb-4">
+  <div class="card-header bg-info text-white">
+    <h6 class="mb-0"><i class="bi bi-person-plus"></i> Attribuer un parrain à {{ selectedEnfant.nom }} {{ selectedEnfant.prenom }}</h6>
+  </div>
+  <div class="card-body">
+    <form (ngSubmit)="attribuerParrain()">
+      <div class="row g-2 align-items-end">
+        <div class="col-md-6">
+          <label class="form-label">Choisir un parrain</label>
+          <select class="form-select" [(ngModel)]="selectedParrainId" name="parrainId" required>
+            <option [ngValue]="null">-- Sélectionner --</option>
+            <option *ngFor="let parrain of parrains" [value]="parrain.id">{{ parrain.nom }} ({{ parrain.contact }})</option>
+          </select>
+        </div>
+        <div class="col-md-6">
+          <button type="submit" class="btn btn-success me-2" [disabled]="!selectedParrainId"><i class="bi bi-check-circle"></i> Attribuer</button>
+          <button type="button" class="btn btn-secondary" (click)="cancel()"><i class="bi bi-x-circle"></i> Annuler</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

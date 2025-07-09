@@ -1,0 +1,7 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-light px-3">
+  <a class="navbar-brand" href="#"></a>
+  <div class="ms-auto d-flex align-items-center">
+    <span class="me-3">Rôle : <strong>{{ userRole || 'Non connecté' }}</strong></span>
+    <button class="btn btn-outline-danger btn-sm" (click)="logout()">Déconnexion</button>
+  </div>
+</nav>

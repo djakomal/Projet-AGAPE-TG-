@@ -1,0 +1,422 @@
+<div class="container-fluid">
+  <!-- En-tête avec statistiques -->
+  <div class="row mb-4">
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-primary">{{ formatMontant(totalBudget) }}</h3>
+          <small>Budget Total {{ anneeSelectionnee }}</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-success">{{ formatMontant(totalEntrees) }}</h3>
+          <small>Entrées {{ anneeSelectionnee }}</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 class="text-danger">{{ formatMontant(totalSorties) }}</h3>
+          <small>Sorties {{ anneeSelectionnee }}</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card text-center">
+        <div class="card-body">
+          <h3 [class]="solde >= 0 ? 'text-success' : 'text-danger'">{{ formatMontant(solde) }}</h3>
+          <small>Solde {{ anneeSelectionnee }}</small>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="row mb-3">
+    <div class="col-md-3">
+      <label class="form-label">Année</label>
+      <select class="form-select" [(ngModel)]="anneeSelectionnee" (change)="refresh()">
+        <option value="2024">2024</option>
+        <option value="2023">2023</option>
+        <option value="2022">2022</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Catégorie</label>
+      <select class="form-select" [(ngModel)]="categorieSelectionnee">
+        <option value="">Toutes</option>
+        <option value="scolarite">Scolarité</option>
+        <option value="sante">Santé</option>
+        <option value="nutrition">Nutrition</option>
+        <option value="transport">Transport</option>
+        <option value="administration">Administration</option>
+        <option value="autres">Autres</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <label class="form-label">Statut</label>
+      <select class="form-select" [(ngModel)]="statutSelectionne">
+        <option value="">Tous</option>
+        <option value="en_cours">En cours</option>
+        <option value="epuise">Épuisé</option>
+        <option value="ferme">Fermé</option>
+        <option value="validee">Validée</option>
+        <option value="en_attente">En attente</option>
+        <option value="rejetee">Rejetée</option>
+      </select>
+    </div>
+    <div class="col-md-3 d-flex align-items-end">
+      <div class="btn-group w-100">
+        <button class="btn btn-primary" (click)="genererRapport()">
+          <i class="bi bi-file-earmark-text me-2"></i>Rapport
+        </button>
+        <button class="btn btn-success" (click)="imprimerRapport()">
+          <i class="bi bi-printer me-2"></i>Imprimer
+        </button>
+        <button class="btn btn-info" (click)="exporterPDF()">
+          <i class="bi bi-file-earmark-pdf me-2"></i>PDF
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onglets -->
+  <ul class="nav nav-tabs mb-3" id="financeTabs" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="budgets-tab" data-bs-toggle="tab" data-bs-target="#budgets" type="button" role="tab">
+        <i class="bi bi-cash-stack me-2"></i>Budgets
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="depenses-tab" data-bs-toggle="tab" data-bs-target="#depenses" type="button" role="tab">
+        <i class="bi bi-receipt me-2"></i>Dépenses
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="transactions-tab" data-bs-toggle="tab" data-bs-target="#transactions" type="button" role="tab">
+        <i class="bi bi-arrow-left-right me-2"></i>Transactions
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content" id="financeTabsContent">
+    <!-- Onglet Budgets -->
+    <div class="tab-pane fade show active" id="budgets" role="tabpanel">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0">Gestion des Budgets</h6>
+          <button class="btn btn-primary btn-sm" (click)="showBudgetForm = true">
+            <i class="bi bi-plus me-2"></i>Nouveau Budget
+          </button>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Catégorie</th>
+                <th>Montant Alloué</th>
+                <th>Montant Utilisé</th>
+                <th>Montant Restant</th>
+                <th>Statut</th>
+                <th>Date Création</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let budget of getBudgetsFiltres()">
+                <td><strong>{{ budget.categorie | titlecase }}</strong></td>
+                <td>{{ formatMontant(budget.montantAlloue) }}</td>
+                <td>{{ formatMontant(budget.montantUtilise) }}</td>
+                <td>{{ formatMontant(budget.montantRestant) }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getStatutClass(budget.statut)">
+                    {{ budget.statut | titlecase }}
+                  </span>
+                </td>
+                <td>{{ budget.dateCreation | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button class="btn btn-outline-primary" (click)="modifierBudget(budget)">
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" (click)="supprimerBudget(budget.id)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Dépenses -->
+    <div class="tab-pane fade" id="depenses" role="tabpanel">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0">Gestion des Dépenses</h6>
+          <button class="btn btn-primary btn-sm" (click)="showDepenseForm = true">
+            <i class="bi bi-plus me-2"></i>Nouvelle Dépense
+          </button>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Description</th>
+                <th>Catégorie</th>
+                <th>Montant</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Justificatif</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let depense of getDepensesFiltrees()">
+                <td><strong>{{ depense.description }}</strong></td>
+                <td>{{ depense.categorie | titlecase }}</td>
+                <td>{{ formatMontant(depense.montant) }}</td>
+                <td>{{ depense.dateDepense | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getStatutClass(depense.statut)">
+                    {{ depense.statut | titlecase }}
+                  </span>
+                </td>
+                <td>
+                  <span *ngIf="depense.justificatif" class="text-success">
+                    <i class="bi bi-check-circle"></i> Présent
+                  </span>
+                  <span *ngIf="!depense.justificatif" class="text-warning">
+                    <i class="bi bi-exclamation-triangle"></i> Manquant
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button *ngIf="depense.statut === 'en_attente'" 
+                            class="btn btn-outline-success" 
+                            (click)="validerDepense(depense)">
+                      <i class="bi bi-check"></i>
+                    </button>
+                    <button *ngIf="depense.statut === 'en_attente'" 
+                            class="btn btn-outline-danger" 
+                            (click)="rejeterDepense(depense, 'Motif de rejet')">
+                      <i class="bi bi-x"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" (click)="supprimerDepense(depense.id)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Transactions -->
+    <div class="tab-pane fade" id="transactions" role="tabpanel">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h6 class="mb-0">Gestion des Transactions</h6>
+          <button class="btn btn-primary btn-sm" (click)="showTransactionForm = true">
+            <i class="bi bi-plus me-2"></i>Nouvelle Transaction
+          </button>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Catégorie</th>
+                <th>Montant</th>
+                <th>Date</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let transaction of getTransactionsFiltrees()">
+                <td>
+                  <span class="badge" [ngClass]="transaction.type === 'entree' ? 'bg-success' : 'bg-danger'">
+                    {{ transaction.type | titlecase }}
+                  </span>
+                </td>
+                <td><strong>{{ transaction.description }}</strong></td>
+                <td>{{ transaction.categorie | titlecase }}</td>
+                <td [class]="getTypeClass(transaction.type)">{{ formatMontant(transaction.montant) }}</td>
+                <td>{{ transaction.dateTransaction | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getStatutClass(transaction.statut)">
+                    {{ transaction.statut | titlecase }}
+                  </span>
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm">
+                    <button *ngIf="transaction.statut === 'en_attente'" 
+                            class="btn btn-outline-success" 
+                            (click)="confirmerTransaction(transaction)">
+                      <i class="bi bi-check"></i>
+                    </button>
+                    <button *ngIf="transaction.statut === 'en_attente'" 
+                            class="btn btn-outline-danger" 
+                            (click)="annulerTransaction(transaction)">
+                      <i class="bi bi-x"></i>
+                    </button>
+                    <button class="btn btn-outline-danger" (click)="supprimerTransaction(transaction.id)">
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nouveau Budget -->
+<div class="modal fade" [class.show]="showBudgetForm" [style.display]="showBudgetForm ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nouveau Budget</h5>
+        <button type="button" class="btn-close" (click)="resetBudgetForm()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Catégorie</label>
+            <select class="form-select" [(ngModel)]="nouveauBudget.categorie" name="categorie">
+              <option value="scolarite">Scolarité</option>
+              <option value="sante">Santé</option>
+              <option value="nutrition">Nutrition</option>
+              <option value="transport">Transport</option>
+              <option value="administration">Administration</option>
+              <option value="autres">Autres</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Montant Alloué</label>
+            <input type="number" class="form-control" [(ngModel)]="nouveauBudget.montantAlloue" name="montantAlloue">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" [(ngModel)]="nouveauBudget.description" name="description"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="resetBudgetForm()">Annuler</button>
+        <button type="button" class="btn btn-primary" (click)="ajouterBudget()">Ajouter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nouvelle Dépense -->
+<div class="modal fade" [class.show]="showDepenseForm" [style.display]="showDepenseForm ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nouvelle Dépense</h5>
+        <button type="button" class="btn-close" (click)="resetDepenseForm()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Catégorie</label>
+            <select class="form-select" [(ngModel)]="nouvelleDepense.categorie" name="categorie">
+              <option value="scolarite">Scolarité</option>
+              <option value="sante">Santé</option>
+              <option value="nutrition">Nutrition</option>
+              <option value="transport">Transport</option>
+              <option value="administration">Administration</option>
+              <option value="autres">Autres</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-control" [(ngModel)]="nouvelleDepense.description" name="description">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Montant</label>
+            <input type="number" class="form-control" [(ngModel)]="nouvelleDepense.montant" name="montant">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Justificatif</label>
+            <input type="text" class="form-control" [(ngModel)]="nouvelleDepense.justificatif" name="justificatif">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="resetDepenseForm()">Annuler</button>
+        <button type="button" class="btn btn-primary" (click)="ajouterDepense()">Ajouter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Nouvelle Transaction -->
+<div class="modal fade" [class.show]="showTransactionForm" [style.display]="showTransactionForm ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nouvelle Transaction</h5>
+        <button type="button" class="btn-close" (click)="resetTransactionForm()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Type</label>
+            <select class="form-select" [(ngModel)]="nouvelleTransaction.type" name="type">
+              <option value="entree">Entrée</option>
+              <option value="sortie">Sortie</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <input type="text" class="form-control" [(ngModel)]="nouvelleTransaction.description" name="description">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Catégorie</label>
+            <select class="form-select" [(ngModel)]="nouvelleTransaction.categorie" name="categorie">
+              <option value="parrainage">Parrainage</option>
+              <option value="subvention">Subvention</option>
+              <option value="scolarite">Scolarité</option>
+              <option value="sante">Santé</option>
+              <option value="nutrition">Nutrition</option>
+              <option value="transport">Transport</option>
+              <option value="administration">Administration</option>
+              <option value="autres">Autres</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Montant</label>
+            <input type="number" class="form-control" [(ngModel)]="nouvelleTransaction.montant" name="montant">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Référence</label>
+            <input type="text" class="form-control" [(ngModel)]="nouvelleTransaction.reference" name="reference">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="resetTransactionForm()">Annuler</button>
+        <button type="button" class="btn btn-primary" (click)="ajouterTransaction()">Ajouter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Overlay pour les modals -->
+<div class="modal-backdrop fade show" *ngIf="showBudgetForm || showDepenseForm || showTransactionForm"></div>

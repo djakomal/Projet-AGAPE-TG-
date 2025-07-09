@@ -1,0 +1,252 @@
+<div class="container-fluid">
+  <!-- Header moderne avec statistiques -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-gradient-primary text-white border-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h4 class="mb-0"><i class="bi bi-book-fill me-2"></i>Gestion Scolaire</h4>
+              <small class="opacity-75">Suivi et gestion des enfants scolarisés</small>
+            </div>
+            <div class="d-flex gap-2">
+              <button class="btn btn-light btn-sm" (click)="imprimerScolarite()">
+                <i class="bi bi-printer me-1"></i>Imprimer
+              </button>
+              <button class="btn btn-light btn-sm" (click)="exporterPDF()">
+                <i class="bi bi-file-pdf me-1"></i>Export PDF
+              </button>
+              <button class="btn btn-light btn-sm" (click)="genererRapport()">
+                <i class="bi bi-file-text me-1"></i>Générer Rapport
+              </button>
+              <button class="btn btn-light btn-sm" (click)="startAdd()">
+                <i class="bi bi-plus-circle me-1"></i>Ajouter un enfant
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-3">
+              <div class="stat-card bg-primary bg-opacity-10 rounded p-3">
+                <h3 class="text-primary mb-1">{{ totalEnfants }}</h3>
+                <small class="text-muted">Total Enfants</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card bg-success bg-opacity-10 rounded p-3">
+                <h3 class="text-success mb-1">{{ enfantsReussis }}</h3>
+                <small class="text-muted">Réussis</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card bg-warning bg-opacity-10 rounded p-3">
+                <h3 class="text-warning mb-1">{{ enfantsEchoues }}</h3>
+                <small class="text-muted">Échoués</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card bg-info bg-opacity-10 rounded p-3">
+                <h3 class="text-info mb-1">{{ enfantsParraines }}</h3>
+                <small class="text-muted">Parrainés</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau principal avec design amélioré -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-bottom">
+      <div class="d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 text-dark">
+          <i class="bi bi-table me-2"></i>Liste des enfants scolarisés
+        </h6>
+        <div class="d-flex gap-2">
+          <div class="input-group input-group-sm" style="width: 250px;">
+            <span class="input-group-text bg-light border-end-0">
+              <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text" class="form-control border-start-0" placeholder="Rechercher un enfant..." 
+                   [(ngModel)]="searchTerm" (input)="filterEnfants()">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="border-0">
+                <i class="bi bi-hash me-1"></i>Numéro
+              </th>
+              <th class="border-0">
+                <i class="bi bi-person me-1"></i>Nom & Prénom
+              </th>
+              <th class="border-0">
+                <i class="bi bi-calendar me-1"></i>Âge
+              </th>
+              <th class="border-0">
+                <i class="bi bi-mortarboard me-1"></i>Classe
+              </th>
+              <th class="border-0">
+                <i class="bi bi-trophy me-1"></i>Résultat
+              </th>
+              <th class="border-0">
+                <i class="bi bi-people me-1"></i>Parrainage
+              </th>
+              <th class="border-0 text-center">
+                <i class="bi bi-gear me-1"></i>Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let enfant of filteredEnfants" class="align-middle">
+              <td>
+                <span class="badge bg-secondary">{{ enfant.numero }}</span>
+              </td>
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="avatar-sm bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3">
+                    <i class="bi bi-person text-primary"></i>
+                  </div>
+                  <div>
+                    <div class="fw-semibold">{{ enfant.nom }} {{ enfant.prenom }}</div>
+                    <small class="text-muted">ID: {{ enfant.id }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-info bg-opacity-10 text-info">{{ enfant.age }} ans</span>
+              </td>
+              <td>
+                <span class="badge bg-primary bg-opacity-10 text-primary">{{ enfant.classe }}</span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="enfant.resultat_annee === 'reussi' ? 'bg-success' : 'bg-danger'">
+                  <i class="bi me-1" [ngClass]="enfant.resultat_annee === 'reussi' ? 'bi-check-circle' : 'bi-x-circle'"></i>
+                  {{ enfant.resultat_annee === 'reussi' ? 'Réussi' : 'Échoué' }}
+                </span>
+              </td>
+              <td>
+                <span *ngIf="enfant.parrainId" class="badge bg-success bg-opacity-10 text-success">
+                  <i class="bi bi-check-circle me-1"></i>Parrainé
+                </span>
+                <span *ngIf="!enfant.parrainId" class="badge bg-warning bg-opacity-10 text-warning">
+                  <i class="bi bi-exclamation-circle me-1"></i>Non parrainé
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                  <button class="btn btn-outline-primary" (click)="select(enfant)" title="Modifier">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-outline-danger" (click)="delete(enfant)" title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filteredEnfants.length === 0">
+              <td colspan="7" class="text-center py-4">
+                <div class="text-muted">
+                  <i class="bi bi-inbox display-4"></i>
+                  <p class="mt-2">Aucun enfant trouvé</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal d'ajout/édition avec design amélioré -->
+  <div *ngIf="selected" class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-gradient-primary text-white border-0">
+          <h5 class="modal-title">
+            <i class="bi me-2" [ngClass]="isEdit ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
+            {{ isEdit ? 'Modifier' : 'Ajouter' }} un enfant
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="cancel()"></button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="save()" class="needs-validation" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-hash me-1"></i>Numéro
+                </label>
+                <input class="form-control" [(ngModel)]="selected.numero" name="numero" required />
+                <div class="invalid-feedback">Le numéro est requis</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-person me-1"></i>Nom
+                </label>
+                <input class="form-control" [(ngModel)]="selected.nom" name="nom" required />
+                <div class="invalid-feedback">Le nom est requis</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-person-badge me-1"></i>Prénom
+                </label>
+                <input class="form-control" [(ngModel)]="selected.prenom" name="prenom" required />
+                <div class="invalid-feedback">Le prénom est requis</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-calendar me-1"></i>Âge
+                </label>
+                <input type="number" class="form-control" [(ngModel)]="selected.age" name="age" required min="1" max="25" />
+                <div class="invalid-feedback">L'âge doit être entre 1 et 25 ans</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-mortarboard me-1"></i>Classe
+                </label>
+                <select class="form-select" [(ngModel)]="selected.classe" name="classe" required>
+                  <option value="">Sélectionner une classe</option>
+                  <option value="CP">CP</option>
+                  <option value="CE1">CE1</option>
+                  <option value="CE2">CE2</option>
+                  <option value="CM1">CM1</option>
+                  <option value="CM2">CM2</option>
+                  <option value="6ème">6ème</option>
+                  <option value="5ème">5ème</option>
+                  <option value="4ème">4ème</option>
+                  <option value="3ème">3ème</option>
+                </select>
+                <div class="invalid-feedback">La classe est requise</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-trophy me-1"></i>Résultat Année
+                </label>
+                <select class="form-select" [(ngModel)]="selected.resultat_annee" name="resultat_annee" required>
+                  <option value="reussi">Réussi</option>
+                  <option value="echoue">Échoué</option>
+                </select>
+                <div class="invalid-feedback">Le résultat est requis</div>
+              </div>
+            </div>
+            <div class="mt-4 d-flex gap-2 justify-content-end">
+              <button type="button" class="btn btn-secondary" (click)="cancel()">
+                <i class="bi bi-x-circle me-1"></i>Annuler
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi me-1" [ngClass]="isEdit ? 'bi-check-circle' : 'bi-plus-circle'"></i>
+                {{ isEdit ? 'Enregistrer' : 'Ajouter' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

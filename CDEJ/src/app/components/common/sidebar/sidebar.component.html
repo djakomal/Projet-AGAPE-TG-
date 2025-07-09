@@ -1,0 +1,12 @@
+<nav class="sidebar bg-white shadow-sm p-3 rounded-end h-100">
+  <div class="mb-4 text-center">
+    <span class="fs-4 fw-bold text-primary"><i class="bi bi-motherboard me-2"></i>TG 105</span>
+  </div>
+  <ul class="nav flex-column gap-2">
+    <li class="nav-item" *ngFor="let link of links; let i = index">
+      <a class="nav-link d-flex align-items-center sidebar-link" [routerLink]="link.route" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
+        <i class="bi me-2" [ngClass]="getIcon(i)"></i> {{ link.label }}
+      </a>
+    </li>
+  </ul>
+</nav>

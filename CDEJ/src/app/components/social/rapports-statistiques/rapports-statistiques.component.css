@@ -1,0 +1,248 @@
+/* Styles pour les rapports et statistiques - Thème Bleu et Blanc */
+
+/* Styles généraux */
+.card {
+  box-shadow: var(--shadow-light);
+  border: var(--border-light);
+  background: var(--white);
+}
+
+.progress {
+  height: 0.5rem;
+  background-color: var(--white-off);
+}
+
+.badge {
+  font-size: 0.75rem;
+}
+
+/* Styles pour les onglets */
+.nav-tabs .nav-link {
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--gray-medium);
+  transition: var(--transition-normal);
+}
+
+.nav-tabs .nav-link.active {
+  border-bottom-color: var(--primary-blue);
+  color: var(--primary-blue);
+  background: none;
+  font-weight: 600;
+}
+
+.nav-tabs .nav-link:hover {
+  border-bottom-color: var(--primary-blue);
+  color: var(--primary-blue);
+}
+
+/* Styles pour les KPI cards */
+.card.text-center h3 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  color: var(--primary-blue);
+}
+
+.card.text-center small {
+  font-size: 0.875rem;
+  color: var(--gray-medium);
+}
+
+/* Styles pour les tableaux */
+.table th {
+  background-color: var(--white-off);
+  border-bottom: 2px solid var(--gray-light);
+  font-weight: 600;
+  color: var(--gray-dark);
+}
+
+.table-striped > tbody > tr:nth-of-type(odd) > td {
+  background-color: var(--white-off-2);
+}
+
+.table tbody tr:hover {
+  background-color: var(--primary-blue-lighter);
+}
+
+/* Styles pour les alertes */
+.alert {
+  border-left: 4px solid;
+  background-color: var(--white);
+}
+
+.alert-danger {
+  border-left-color: var(--danger);
+  color: var(--danger);
+}
+
+.alert-warning {
+  border-left-color: var(--warning);
+  color: var(--warning);
+}
+
+.alert-info {
+  border-left-color: var(--info);
+  color: var(--info);
+}
+
+.alert-primary {
+  border-left-color: var(--primary-blue);
+  color: var(--primary-blue);
+  background-color: var(--primary-blue-lighter);
+}
+
+/* Styles d'impression */
+@media print {
+  /* Masquer les éléments non nécessaires à l'impression */
+  .nav-tabs,
+  .btn-group,
+  .btn,
+  .alert {
+    display: none !important;
+  }
+
+  /* Styles pour l'impression */
+  body {
+    font-size: 12pt;
+    line-height: 1.4;
+    background: var(--white);
+    color: var(--gray-dark);
+  }
+
+  .container-fluid {
+    width: 100% !important;
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .card {
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+    background: var(--white) !important;
+  }
+
+  .card-header {
+    background-color: var(--white-off) !important;
+    border-bottom: 1px solid #000 !important;
+  }
+
+  .table {
+    font-size: 10pt;
+  }
+
+  .table th,
+  .table td {
+    border: 1px solid #000 !important;
+    padding: 4px !important;
+  }
+
+  .badge {
+    border: 1px solid #000 !important;
+    background-color: var(--white) !important;
+    color: #000 !important;
+  }
+
+  .progress {
+    border: 1px solid #000 !important;
+    background-color: var(--white) !important;
+  }
+
+  .progress-bar {
+    background-color: #000 !important;
+  }
+
+  /* En-tête d'impression */
+  .print-section::before {
+    content: "ONG Manager - Rapports et Statistiques";
+    display: block;
+    font-size: 18pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 10px;
+    color: var(--primary-blue);
+  }
+
+  /* Date d'impression */
+  .print-section::after {
+    content: "Imprimé le " attr(data-print-date);
+    display: block;
+    font-size: 10pt;
+    text-align: right;
+    margin-top: 20px;
+    color: var(--gray-medium);
+  }
+
+  /* Pagination */
+  .tab-pane {
+    page-break-after: always;
+  }
+
+  .tab-pane:last-child {
+    page-break-after: avoid;
+  }
+
+  /* Masquer les sections non sélectionnées */
+  .print-section:not(.print-active) {
+    display: none !important;
+  }
+}
+
+/* Styles pour les graphiques (simulation) */
+.graph-container {
+  height: 200px;
+  background: linear-gradient(45deg, var(--white-off) 25%, transparent 25%), 
+              linear-gradient(-45deg, var(--white-off) 25%, transparent 25%), 
+              linear-gradient(45deg, transparent 75%, var(--white-off) 75%), 
+              linear-gradient(-45deg, transparent 75%, var(--white-off) 75%);
+  background-size: 20px 20px;
+  background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+  border: var(--border-light);
+  border-radius: 0.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gray-medium);
+  font-style: italic;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card.text-center h3 {
+    font-size: 2rem;
+  }
+  
+  .table {
+    font-size: 0.875rem;
+  }
+  
+  .btn-group {
+    flex-direction: column;
+  }
+  
+  .btn-group .btn {
+    margin-bottom: 0.25rem;
+  }
+}
+
+/* Effets de survol */
+.card:hover {
+  box-shadow: var(--shadow-medium);
+  transition: var(--transition-normal);
+}
+
+.progress-bar {
+  background-color: var(--primary-blue);
+}
+
+.table-info {
+  background-color: var(--primary-blue-lighter);
+}
+
+.table-info td {
+  border-color: var(--primary-blue);
+}

@@ -1,0 +1,235 @@
+/* Styles pour le suivi santé - Thème Bleu et Blanc */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+}
+
+.stat-card {
+  transition: var(--transition-normal);
+  border: 1px solid rgba(0,0,0,0.05);
+  background: var(--white);
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.avatar-sm {
+  width: 40px;
+  height: 40px;
+  font-size: 1.2rem;
+  background: var(--primary-blue-lighter);
+  color: var(--primary-blue);
+}
+
+.table th {
+  font-weight: 600;
+  color: var(--gray-dark);
+  border-bottom: 2px solid var(--gray-light);
+  background: var(--white-off);
+}
+
+.table td {
+  vertical-align: middle;
+  border-bottom: 1px solid var(--white-off-2);
+}
+
+.table tbody tr:hover {
+  background-color: var(--primary-blue-lighter);
+}
+
+.badge {
+  font-size: 0.75rem;
+  padding: 0.5em 0.75em;
+}
+
+.btn-group .btn {
+  border-radius: 0.375rem;
+  margin: 0 1px;
+  transition: var(--transition-fast);
+}
+
+.btn-group .btn:first-child {
+  border-top-left-radius: 0.375rem;
+  border-bottom-left-radius: 0.375rem;
+}
+
+.btn-group .btn:last-child {
+  border-top-right-radius: 0.375rem;
+  border-bottom-right-radius: 0.375rem;
+}
+
+.modal-content {
+  border-radius: 0.75rem;
+  background: var(--white);
+  border: var(--border-light);
+}
+
+.modal-header {
+  border-radius: 0.75rem 0.75rem 0 0;
+  background: var(--primary-blue);
+  color: var(--white);
+}
+
+.form-label {
+  color: var(--gray-dark);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.form-control, .form-select {
+  border-radius: 0.5rem;
+  border: var(--border-light);
+  transition: var(--transition-normal);
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.input-group-text {
+  border-radius: 0.5rem 0 0 0.5rem;
+  background-color: var(--white-off);
+  border: var(--border-light);
+}
+
+.input-group .form-control {
+  border-radius: 0 0.5rem 0.5rem 0;
+}
+
+/* Animation pour les cartes de statistiques */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stat-card {
+  animation: fadeInUp 0.6s ease-out;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .stat-card {
+    margin-bottom: 1rem;
+  }
+  
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  
+  .btn-group .btn {
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Styles pour l'état vide */
+.text-muted .display-4 {
+  font-size: 3rem;
+  opacity: 0.3;
+  color: var(--gray-medium);
+}
+
+/* Amélioration des badges avec couleurs uniformes */
+.badge.bg-primary.bg-opacity-10 {
+  background-color: rgba(0, 123, 255, 0.1) !important;
+  color: var(--primary-blue) !important;
+}
+
+.badge.bg-success.bg-opacity-10 {
+  background-color: rgba(40, 167, 69, 0.1) !important;
+  color: var(--success) !important;
+}
+
+.badge.bg-warning.bg-opacity-10 {
+  background-color: rgba(255, 193, 7, 0.1) !important;
+  color: var(--warning) !important;
+}
+
+.badge.bg-info.bg-opacity-10 {
+  background-color: rgba(23, 162, 184, 0.1) !important;
+  color: var(--info) !important;
+}
+
+/* Couleurs spécifiques pour les statuts */
+.badge.bg-success {
+  background-color: var(--success) !important;
+}
+
+.badge.bg-danger {
+  background-color: var(--danger) !important;
+}
+
+.badge.bg-warning {
+  background-color: var(--warning) !important;
+}
+
+.badge.bg-info {
+  background-color: var(--info) !important;
+}
+
+/* Styles spécifiques pour les mesures médicales */
+.medical-measures {
+  background: var(--white-off);
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  border-left: 3px solid var(--primary-blue);
+}
+
+.temperature-high {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.temperature-normal {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.imc-warning {
+  background-color: var(--warning) !important;
+  color: var(--white) !important;
+}
+
+.imc-danger {
+  background-color: var(--danger) !important;
+  color: var(--white) !important;
+}
+
+.imc-success {
+  background-color: var(--success) !important;
+  color: var(--white) !important;
+}
+
+/* Styles pour les formulaires médicaux */
+.form-check-input:checked {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+
+.form-check-input:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+/* Animation pour les nouvelles entrées */
+.table tbody tr {
+  animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}

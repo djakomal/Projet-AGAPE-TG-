@@ -1,0 +1,308 @@
+<div class="container-fluid">
+  <!-- Header moderne avec statistiques -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-gradient-primary text-white border-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h4 class="mb-0"><i class="bi bi-virus me-2"></i>Gestion Maladies</h4>
+              <small class="opacity-75">Catalogue et suivi des pathologies</small>
+            </div>
+            <button class="btn btn-light btn-sm" (click)="startAdd()">
+              <i class="bi bi-plus-circle me-1"></i>Nouvelle maladie
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-3">
+              <div class="stat-card bg-primary bg-opacity-10 rounded p-3">
+                <h3 class="text-primary mb-1">{{ totalMaladies }}</h3>
+                <small class="text-muted">Total Maladies</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card bg-info bg-opacity-10 rounded p-3">
+                <h3 class="text-info mb-1">{{ maladiesRespiratoires }}</h3>
+                <small class="text-muted">Respiratoires</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card bg-danger bg-opacity-10 rounded p-3">
+                <h3 class="text-danger mb-1">{{ maladiesContagieuses }}</h3>
+                <small class="text-muted">Très Contagieuses</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card bg-success bg-opacity-10 rounded p-3">
+                <h3 class="text-success mb-1">{{ coutTotalMoyen }}€</h3>
+                <small class="text-muted">Coût Moyen</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres et recherche -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0">
+              <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text" class="form-control border-start-0" placeholder="Rechercher une maladie..." 
+                   [(ngModel)]="searchTerm" (input)="filterMaladies()">
+          </div>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" [(ngModel)]="selectedCategory" (change)="filterMaladies()">
+            <option value="">Toutes les catégories</option>
+            <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.label }}</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select class="form-select" [(ngModel)]="selectedContagion" (change)="filterMaladies()">
+            <option value="">Tous les niveaux</option>
+            <option *ngFor="let niveau of niveauxContagion" [value]="niveau.value">{{ niveau.label }}</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <button class="btn btn-outline-secondary w-100" (click)="clearFilters()">
+            <i class="bi bi-x-circle me-1"></i>Effacer
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau principal avec design amélioré -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-bottom">
+      <div class="d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 text-dark">
+          <i class="bi bi-table me-2"></i>Catalogue des maladies
+        </h6>
+        <span class="badge bg-primary">{{ filteredMaladies.length }} résultat(s)</span>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="border-0">
+                <i class="bi bi-virus me-1"></i>Maladie
+              </th>
+              <th class="border-0">
+                <i class="bi bi-tag me-1"></i>Catégorie
+              </th>
+              <th class="border-0">
+                <i class="bi bi-exclamation-triangle me-1"></i>Contagion
+              </th>
+              <th class="bi bi-clock me-1">Durée</th>
+              <th class="border-0">
+                <i class="bi bi-cash me-1"></i>Coût
+              </th>
+              <th class="border-0">
+                <i class="bi bi-list-ul me-1"></i>Symptômes
+              </th>
+              <th class="border-0 text-center">
+                <i class="bi bi-gear me-1"></i>Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let maladie of filteredMaladies" class="align-middle">
+              <td>
+                <div>
+                  <div class="fw-semibold">{{ maladie.nom }}</div>
+                  <small class="text-muted">{{ maladie.description }}</small>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-info bg-opacity-10 text-info">
+                  {{ getCategorieLabel(maladie.categorie) }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="'bg-' + getContagionColor(maladie.niveau_contagion)">
+                  {{ getContagionLabel(maladie.niveau_contagion) }}
+                </span>
+              </td>
+              <td>
+                <span class="badge bg-secondary">{{ maladie.duree_moyenne }} jours</span>
+              </td>
+              <td>
+                <span class="badge bg-success bg-opacity-10 text-success">{{ maladie.cout_moyen }}€</span>
+              </td>
+              <td>
+                <div class="small">
+                  <div *ngFor="let symptome of maladie.symptomes.slice(0, 2)" class="text-muted">
+                    • {{ symptome }}
+                  </div>
+                  <div *ngIf="maladie.symptomes.length > 2" class="text-primary">
+                    +{{ maladie.symptomes.length - 2 }} autres...
+                  </div>
+                </div>
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                  <button class="btn btn-outline-primary" (click)="select(maladie)" title="Modifier">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-outline-danger" (click)="delete(maladie)" title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filteredMaladies.length === 0">
+              <td colspan="7" class="text-center py-4">
+                <div class="text-muted">
+                  <i class="bi bi-inbox display-4"></i>
+                  <p class="mt-2">Aucune maladie trouvée</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal d'ajout/édition avec design amélioré -->
+  <div *ngIf="selected" class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
+    <div class="modal-dialog modal-xl">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-gradient-primary text-white border-0">
+          <h5 class="modal-title">
+            <i class="bi me-2" [ngClass]="isEdit ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
+            {{ isEdit ? 'Modifier' : 'Ajouter' }} une maladie
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="cancel()"></button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="save()" class="needs-validation" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-virus me-1"></i>Nom de la maladie
+                </label>
+                <input class="form-control" [(ngModel)]="selected.nom" name="nom" required />
+                <div class="invalid-feedback">Le nom est requis</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-tag me-1"></i>Catégorie
+                </label>
+                <select class="form-select" [(ngModel)]="selected.categorie" name="categorie" required>
+                  <option *ngFor="let cat of categories" [value]="cat.value">{{ cat.label }}</option>
+                </select>
+                <div class="invalid-feedback">La catégorie est requise</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-exclamation-triangle me-1"></i>Niveau de contagion
+                </label>
+                <select class="form-select" [(ngModel)]="selected.niveau_contagion" name="niveau_contagion" required>
+                  <option *ngFor="let niveau of niveauxContagion" [value]="niveau.value">{{ niveau.label }}</option>
+                </select>
+                <div class="invalid-feedback">Le niveau de contagion est requis</div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-clock me-1"></i>Durée moyenne (jours)
+                </label>
+                <input type="number" class="form-control" [(ngModel)]="selected.duree_moyenne" name="duree_moyenne" required min="1" max="365" />
+                <div class="invalid-feedback">La durée doit être entre 1 et 365 jours</div>
+              </div>
+              <div class="col-md-3">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-cash me-1"></i>Coût moyen (€)
+                </label>
+                <input type="number" class="form-control" [(ngModel)]="selected.cout_moyen" name="cout_moyen" required min="0" max="10000" />
+                <div class="invalid-feedback">Le coût doit être entre 0 et 10000€</div>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-file-text me-1"></i>Description
+                </label>
+                <textarea class="form-control" rows="3" [(ngModel)]="selected.description" name="description" required></textarea>
+                <div class="invalid-feedback">La description est requise</div>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-list-ul me-1"></i>Symptômes
+                </label>
+                <div class="border rounded p-3 bg-light">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small text-muted">Liste des symptômes</span>
+                    <button type="button" class="btn btn-sm btn-outline-primary" (click)="addSymptome()">
+                      <i class="bi bi-plus-circle me-1"></i>Ajouter
+                    </button>
+                  </div>
+                  <div *ngIf="selected.symptomes && selected.symptomes.length > 0" class="mb-2">
+                    <div *ngFor="let symptome of selected.symptomes; let i = index" class="d-flex justify-content-between align-items-center mb-1">
+                      <span class="badge bg-primary bg-opacity-10 text-primary">{{ symptome }}</span>
+                      <button type="button" class="btn btn-sm btn-outline-danger" (click)="removeSymptome(i)">
+                        <i class="bi bi-x"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div *ngIf="!selected.symptomes || selected.symptomes.length === 0" class="text-muted small">
+                    Aucun symptôme ajouté
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-shield-check me-1"></i>Mesures de prévention
+                </label>
+                <div class="border rounded p-3 bg-light">
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="small text-muted">Liste des mesures de prévention</span>
+                    <button type="button" class="btn btn-sm btn-outline-success" (click)="addPrevention()">
+                      <i class="bi bi-plus-circle me-1"></i>Ajouter
+                    </button>
+                  </div>
+                  <div *ngIf="selected.prevention && selected.prevention.length > 0" class="mb-2">
+                    <div *ngFor="let prevention of selected.prevention; let i = index" class="d-flex justify-content-between align-items-center mb-1">
+                      <span class="badge bg-success bg-opacity-10 text-success">{{ prevention }}</span>
+                      <button type="button" class="btn btn-sm btn-outline-danger" (click)="removePrevention(i)">
+                        <i class="bi bi-x"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <div *ngIf="!selected.prevention || selected.prevention.length === 0" class="text-muted small">
+                    Aucune mesure de prévention ajoutée
+                  </div>
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-clipboard-pulse me-1"></i>Traitement standard
+                </label>
+                <textarea class="form-control" rows="3" [(ngModel)]="selected.traitement_standard" name="traitement_standard" required></textarea>
+                <div class="invalid-feedback">Le traitement standard est requis</div>
+              </div>
+            </div>
+            <div class="mt-4 d-flex gap-2 justify-content-end">
+              <button type="button" class="btn btn-secondary" (click)="cancel()">
+                <i class="bi bi-x-circle me-1"></i>Annuler
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi me-1" [ngClass]="isEdit ? 'bi-check-circle' : 'bi-plus-circle'"></i>
+                {{ isEdit ? 'Enregistrer' : 'Ajouter' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

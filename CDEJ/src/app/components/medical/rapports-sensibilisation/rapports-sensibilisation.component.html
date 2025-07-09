@@ -1,0 +1,357 @@
+<div class="container-fluid">
+  <!-- Header moderne -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-gradient-primary text-white border-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h4 class="mb-0"><i class="bi bi-graph-up me-2"></i>Rapports et Sensibilisation</h4>
+              <small class="opacity-75">Statistiques médicales et rapports de sensibilisation</small>
+            </div>
+            <div class="btn-group" role="group">
+              <button class="btn btn-light btn-sm" (click)="genererRapport()">
+                <i class="bi bi-file-earmark-text me-1"></i>Générer
+              </button>
+              <button class="btn btn-light btn-sm" (click)="exporterPDF()">
+                <i class="bi bi-file-pdf me-1"></i>PDF
+              </button>
+              <button class="btn btn-light btn-sm" (click)="imprimerRapport()">
+                <i class="bi bi-printer me-1"></i>Imprimer
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Type de rapport</label>
+          <select class="form-select" [(ngModel)]="selectedReport">
+            <option value="global">Statistiques Globales</option>
+            <option value="age">Par Classe d'Âge</option>
+            <option value="maladies">Statistiques Maladies</option>
+            <option value="financier">Rapport Financier</option>
+            <option value="annuel">Rapport Annuel</option>
+            <option value="risques">Risques d'Exclusion</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Période</label>
+          <select class="form-select" [(ngModel)]="selectedPeriod">
+            <option value="mois">Ce mois</option>
+            <option value="trimestre">Ce trimestre</option>
+            <option value="semestre">Ce semestre</option>
+            <option value="annee">Cette année</option>
+          </select>
+        </div>
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Année</label>
+          <select class="form-select" [(ngModel)]="selectedYear">
+            <option *ngFor="let annee of annees" [value]="annee.value">{{ annee.label }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu dynamique selon le rapport sélectionné -->
+  <div [ngSwitch]="selectedReport">
+    
+    <!-- Statistiques Globales -->
+    <div *ngSwitchCase="'global'" class="row">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Statistiques Globales</h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-md-3 mb-3">
+                <div class="stat-card bg-primary bg-opacity-10 rounded p-3">
+                  <h3 class="text-primary mb-1">{{ statistiquesGlobales.totalEnfants }}</h3>
+                  <small class="text-muted">Enfants Suivis</small>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="stat-card bg-success bg-opacity-10 rounded p-3">
+                  <h3 class="text-success mb-1">{{ statistiquesGlobales.consultationsTotal }}</h3>
+                  <small class="text-muted">Consultations</small>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="stat-card bg-info bg-opacity-10 rounded p-3">
+                  <h3 class="text-info mb-1">{{ formatMontant(statistiquesGlobales.coutTotal) }}</h3>
+                  <small class="text-muted">Coût Total</small>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="stat-card bg-warning bg-opacity-10 rounded p-3">
+                  <h3 class="text-warning mb-1">{{ statistiquesGlobales.suiviNutritionnel }}</h3>
+                  <small class="text-muted">Suivis Nutrition</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiques par Classe d'Âge -->
+    <div *ngSwitchCase="'age'" class="row">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0"><i class="bi bi-people me-2"></i>Statistiques par Classe d'Âge</h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Classe d'Âge</th>
+                    <th>Nombre d'Enfants</th>
+                    <th>Suivis</th>
+                    <th>Coût Moyen</th>
+                    <th>Pourcentage</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let groupe of statistiquesParAge | keyvalue">
+                    <td class="fw-semibold">{{ groupe.key }}</td>
+                    <td><span class="badge bg-primary">{{ groupe.value.dossiers }}</span></td>
+                    <td><span class="badge bg-info">{{ groupe.value.suivis }}</span></td>
+                    <td><span class="text-success fw-bold">{{ formatMontant(groupe.value.cout) }}</span></td>
+                    <td><span class="badge bg-secondary">{{ round((groupe.value.dossiers / statistiquesGlobales.totalEnfants) * 100) }}%</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistiques Maladies -->
+    <div *ngSwitchCase="'maladies'" class="row">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0"><i class="bi bi-virus me-2"></i>Statistiques des Maladies</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-8">
+                <div class="table-responsive">
+                  <table class="table table-hover">
+                    <thead class="table-light">
+                      <tr>
+                        <th>Catégorie</th>
+                        <th>Nombre</th>
+                        <th>Coût Moyen</th>
+                        <th>Pourcentage</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let categorie of statistiquesMaladies | keyvalue">
+                        <td class="fw-semibold">{{ categorie.key }}</td>
+                        <td><span class="badge bg-primary">{{ categorie.value.nombre }}</span></td>
+                        <td><span class="text-success fw-bold">{{ formatMontant(categorie.value.cout) }}</span></td>
+                        <td><span class="badge bg-info">{{ formatPourcentage(categorie.value.pourcentage) }}</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div class="col-md-4">
+                <div class="card bg-light">
+                  <div class="card-body text-center">
+                    <h6 class="card-title">Répartition</h6>
+                    <div class="mt-3">
+                      <div *ngFor="let categorie of statistiquesMaladies | keyvalue" class="mb-2">
+                        <div class="d-flex justify-content-between">
+                          <span>{{ categorie.key }}</span>
+                          <span class="fw-bold">{{ formatPourcentage(categorie.value.pourcentage) }}</span>
+                        </div>
+                        <div class="progress" style="height: 8px;">
+                          <div class="progress-bar" [style.width.%]="categorie.value.pourcentage"></div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rapport Financier -->
+    <div *ngSwitchCase="'financier'" class="row">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0"><i class="bi bi-cash-stack me-2"></i>Rapport Financier</h5>
+          </div>
+          <div class="card-body">
+            <div class="row text-center">
+              <div class="col-md-3 mb-3">
+                <div class="stat-card bg-success bg-opacity-10 rounded p-3">
+                  <h3 class="text-success mb-1">{{ statistiquesFinancieres.totalPaiements }}</h3>
+                  <small class="text-muted">Total Paiements</small>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="stat-card bg-primary bg-opacity-10 rounded p-3">
+                  <h3 class="text-primary mb-1">{{ formatMontant(statistiquesFinancieres.montantTotal) }}</h3>
+                  <small class="text-muted">Montant Total</small>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="stat-card bg-warning bg-opacity-10 rounded p-3">
+                  <h3 class="text-warning mb-1">{{ statistiquesFinancieres.paiementsEnAttente }}</h3>
+                  <small class="text-muted">En Attente</small>
+                </div>
+              </div>
+              <div class="col-md-3 mb-3">
+                <div class="stat-card bg-danger bg-opacity-10 rounded p-3">
+                  <h3 class="text-danger mb-1">{{ formatMontant(statistiquesFinancieres.montantEnAttente) }}</h3>
+                  <small class="text-muted">Montant En Attente</small>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rapport Annuel -->
+    <div *ngSwitchCase="'annuel'" class="row">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0"><i class="bi bi-calendar-event me-2"></i>Rapport Annuel {{ rapportAnnuel.annee }}</h5>
+          </div>
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <h6 class="fw-semibold">Activités</h6>
+                <ul class="list-unstyled">
+                  <li class="mb-2">
+                    <i class="bi bi-check-circle text-success me-2"></i>
+                    {{ rapportAnnuel.consultations }} consultations réalisées
+                  </li>
+                  <li class="mb-2">
+                    <i class="bi bi-check-circle text-success me-2"></i>
+                    {{ formatMontant(rapportAnnuel.coutTotal) }} de coûts totaux
+                  </li>
+                  <li class="mb-2">
+                    <i class="bi bi-check-circle text-success me-2"></i>
+                    {{ rapportAnnuel.paiements }} paiements traités
+                  </li>
+                  <li class="mb-2">
+                    <i class="bi bi-arrow-up text-success me-2"></i>
+                    Évolution: {{ rapportAnnuel.evolution }}
+                  </li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h6 class="fw-semibold">Objectifs {{ rapportAnnuel.annee + 1 }}</h6>
+                <ul class="list-unstyled">
+                  <li class="mb-2">
+                    <i class="bi bi-target me-2"></i>
+                    {{ rapportAnnuel.objectifs.consultations }} consultations
+                  </li>
+                  <li class="mb-2">
+                    <i class="bi bi-target me-2"></i>
+                    {{ rapportAnnuel.objectifs.vaccination }} de vaccination
+                  </li>
+                  <li class="mb-2">
+                    <i class="bi bi-target me-2"></i>
+                    {{ rapportAnnuel.objectifs.prevention }} de prévention
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Risques d'Exclusion -->
+    <div *ngSwitchCase="'risques'" class="row">
+      <div class="col-12">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-bottom">
+            <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Risques d'Exclusion</h5>
+          </div>
+          <div class="card-body">
+            <div class="row mb-4">
+              <div class="col-md-3 text-center">
+                <div class="stat-card bg-danger bg-opacity-10 rounded p-3">
+                  <h3 class="text-danger mb-1">{{ risquesExclusion.total }}</h3>
+                  <small class="text-muted">Total Risques</small>
+                </div>
+              </div>
+              <div class="col-md-3 text-center">
+                <div class="stat-card bg-danger bg-opacity-10 rounded p-3">
+                  <h3 class="text-danger mb-1">{{ risquesExclusion.eleve }}</h3>
+                  <small class="text-muted">Risque Élevé</small>
+                </div>
+              </div>
+              <div class="col-md-3 text-center">
+                <div class="stat-card bg-warning bg-opacity-10 rounded p-3">
+                  <h3 class="text-warning mb-1">{{ risquesExclusion.modere }}</h3>
+                  <small class="text-muted">Risque Modéré</small>
+                </div>
+              </div>
+              <div class="col-md-3 text-center">
+                <div class="stat-card bg-success bg-opacity-10 rounded p-3">
+                  <h3 class="text-success mb-1">{{ risquesExclusion.faible }}</h3>
+                  <small class="text-muted">Risque Faible</small>
+                </div>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Enfant</th>
+                    <th>Niveau de Risque</th>
+                    <th>Raison</th>
+                    <th>Montant</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let risque of risquesExclusion.details">
+                    <td class="fw-semibold">{{ risque.enfant }}</td>
+                    <td>
+                      <span class="badge" [ngClass]="'bg-' + getRisqueColor(risque.risque)">
+                        {{ risque.risque }}
+                      </span>
+                    </td>
+                    <td>{{ risque.raison }}</td>
+                    <td><span class="text-danger fw-bold">{{ formatMontant(risque.montant) }}</span></td>
+                    <td>
+                      <button class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-eye me-1"></i>Voir
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

@@ -1,0 +1,197 @@
+/* You can add global styles to this file, and also import other style files */
+
+/* @import 'bootstrap/css/bootstrap'; */
+
+/* Variables de couleurs uniformes - Thème Bleu et Blanc */
+:root {
+  /* Couleurs principales */
+  --primary-blue: #007bff;
+  --primary-blue-dark: #0056b3;
+  --primary-blue-light: #4da6ff;
+  --primary-blue-lighter: #e6f3ff;
+  
+  /* Couleurs secondaires */
+  --secondary-blue: #667eea;
+  --secondary-blue-dark: #5a6fd8;
+  --secondary-blue-light: #8b9df0;
+  
+  /* Couleurs neutres */
+  --white: #ffffff;
+  --white-off: #f8f9fa;
+  --white-off-2: #f0f0f0;
+  --gray-light: #e9ecef;
+  --gray-medium: #6c757d;
+  --gray-dark: #495057;
+  --gray-darker: #343a40;
+  
+  /* Couleurs d'état */
+  --success: #28a745;
+  --warning: #ffc107;
+  --danger: #dc3545;
+  --info: #17a2b8;
+  
+  /* Ombres */
+  --shadow-light: 0 2px 8px rgba(0, 123, 255, 0.1);
+  --shadow-medium: 0 4px 12px rgba(0, 123, 255, 0.15);
+  --shadow-heavy: 0 8px 25px rgba(0, 123, 255, 0.2);
+  
+  /* Bordures */
+  --border-light: 1px solid var(--gray-light);
+  --border-medium: 1px solid var(--gray-medium);
+  --border-blue: 1px solid var(--primary-blue);
+  
+  /* Transitions */
+  --transition-fast: 0.2s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+}
+
+/* Styles globaux */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--white-off);
+  color: var(--gray-dark);
+}
+
+/* Override Bootstrap pour uniformiser les couleurs */
+.btn-primary {
+  background-color: var(--primary-blue) !important;
+  border-color: var(--primary-blue) !important;
+  color: var(--white) !important;
+}
+
+.btn-primary:hover {
+  background-color: var(--primary-blue-dark) !important;
+  border-color: var(--primary-blue-dark) !important;
+}
+
+.btn-outline-primary {
+  color: var(--primary-blue) !important;
+  border-color: var(--primary-blue) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: var(--primary-blue) !important;
+  color: var(--white) !important;
+}
+
+.text-primary {
+  color: var(--primary-blue) !important;
+}
+
+.bg-primary {
+  background-color: var(--primary-blue) !important;
+}
+
+.border-primary {
+  border-color: var(--primary-blue) !important;
+}
+
+/* Gradients uniformes */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%) !important;
+}
+
+.bg-gradient-secondary {
+  background: linear-gradient(135deg, var(--secondary-blue) 0%, var(--secondary-blue-dark) 100%) !important;
+}
+
+/* Formulaires */
+.form-control:focus, .form-select:focus {
+  border-color: var(--primary-blue) !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+}
+
+.form-floating > .form-control:focus ~ label,
+.form-floating > .form-control:not(:placeholder-shown) ~ label {
+  transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+  color: var(--primary-blue) !important;
+}
+
+.form-floating > .form-select ~ label {
+  transform: scale(0.85) translateY(-0.5rem) translateX(0.15rem);
+}
+
+/* Cards et conteneurs */
+.card {
+  background-color: var(--white);
+  border: var(--border-light);
+  box-shadow: var(--shadow-light);
+}
+
+.card-header {
+  background-color: var(--white-off);
+  border-bottom: var(--border-light);
+}
+
+/* Tables */
+.table th {
+  background-color: var(--white-off);
+  color: var(--gray-dark);
+  border-bottom: 2px solid var(--gray-light);
+}
+
+.table td {
+  border-bottom: 1px solid var(--white-off-2);
+}
+
+.table tbody tr:hover {
+  background-color: var(--primary-blue-lighter);
+}
+
+/* Badges */
+.badge.bg-primary {
+  background-color: var(--primary-blue) !important;
+}
+
+.badge.bg-primary.bg-opacity-10 {
+  background-color: rgba(0, 123, 255, 0.1) !important;
+  color: var(--primary-blue) !important;
+}
+
+/* Modals */
+.modal-header {
+  background-color: var(--primary-blue);
+  color: var(--white);
+}
+
+.modal-content {
+  border: none;
+  box-shadow: var(--shadow-heavy);
+}
+
+/* Navigation */
+.nav-link.active {
+  background-color: var(--primary-blue) !important;
+  color: var(--white) !important;
+}
+
+.nav-link:hover {
+  color: var(--primary-blue) !important;
+}
+
+/* Alerts */
+.alert-primary {
+  background-color: var(--primary-blue-lighter);
+  border-color: var(--primary-blue);
+  color: var(--primary-blue-dark);
+}
+
+/* Progress bars */
+.progress-bar {
+  background-color: var(--primary-blue) !important;
+}
+
+/* Pagination */
+.page-link {
+  color: var(--primary-blue);
+}
+
+.page-item.active .page-link {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+
+.page-link:hover {
+  color: var(--primary-blue-dark);
+}

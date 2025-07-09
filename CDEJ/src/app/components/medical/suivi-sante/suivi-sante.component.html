@@ -1,0 +1,282 @@
+<div class="container-fluid">
+  <!-- Header moderne avec statistiques -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-gradient-primary text-white border-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h4 class="mb-0"><i class="bi bi-heart-pulse-fill me-2"></i>Suivi Santé</h4>
+              <small class="opacity-75">Surveillance médicale des enfants</small>
+            </div>
+            <button class="btn btn-light btn-sm" (click)="startAdd()">
+              <i class="bi bi-plus-circle me-1"></i>Nouveau suivi
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-3">
+              <div class="stat-card bg-primary bg-opacity-10 rounded p-3">
+                <h3 class="text-primary mb-1">{{ totalSuivis }}</h3>
+                <small class="text-muted">Total Suivis</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card bg-success bg-opacity-10 rounded p-3">
+                <h3 class="text-success mb-1">{{ enfantsNormaux }}</h3>
+                <small class="text-muted">Statut Normal</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card bg-warning bg-opacity-10 rounded p-3">
+                <h3 class="text-warning mb-1">{{ enfantsInsuffisants }}</h3>
+                <small class="text-muted">Attention Requise</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card bg-info bg-opacity-10 rounded p-3">
+                <h3 class="text-info mb-1">{{ vaccinationsAJour }}</h3>
+                <small class="text-muted">Vaccinations OK</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau principal avec design amélioré -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-bottom">
+      <div class="d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 text-dark">
+          <i class="bi bi-table me-2"></i>Historique des suivis de santé
+        </h6>
+        <div class="d-flex gap-2">
+          <div class="input-group input-group-sm" style="width: 250px;">
+            <span class="input-group-text bg-light border-end-0">
+              <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text" class="form-control border-start-0" placeholder="Rechercher un enfant..." 
+                   [(ngModel)]="searchTerm" (input)="filterSuivis()">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="border-0">
+                <i class="bi bi-person me-1"></i>Enfant
+              </th>
+              <th class="border-0">
+                <i class="bi bi-calendar me-1"></i>Date
+              </th>
+              <th class="border-0">
+                <i class="bi bi-speedometer2 me-1"></i>Mesures
+              </th>
+              <th class="border-0">
+                <i class="bi bi-graph-up me-1"></i>IMC
+              </th>
+              <th class="border-0">
+                <i class="bi bi-heart me-1"></i>Statut
+              </th>
+              <th class="border-0">
+                <i class="bi bi-shield-check me-1"></i>Vaccinations
+              </th>
+              <th class="border-0 text-center">
+                <i class="bi bi-gear me-1"></i>Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let suivi of filteredSuivis" class="align-middle">
+              <td>
+                <div class="d-flex align-items-center">
+                  <div class="avatar-sm bg-primary bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center me-3">
+                    <i class="bi bi-person text-primary"></i>
+                  </div>
+                  <div>
+                    <div class="fw-semibold">{{ suivi.enfant_nom }} {{ suivi.enfant_prenom }}</div>
+                    <small class="text-muted">ID: {{ suivi.enfant_id }}</small>
+                  </div>
+                </div>
+              </td>
+              <td>
+                <span class="badge bg-secondary">{{ suivi.date_mesure | date:'dd/MM/yyyy' }}</span>
+              </td>
+              <td>
+                <div class="small">
+                  <div><strong>{{ suivi.poids }}kg</strong> / {{ suivi.taille }}cm</div>
+                  <div class="text-muted">{{ suivi.tension_arterielle }} - {{ suivi.temperature }}°C</div>
+                </div>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="suivi.imc < 18.5 ? 'bg-warning' : suivi.imc > 25 ? 'bg-danger' : 'bg-success'">
+                  {{ suivi.imc }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="'bg-' + getStatutNutritionnelColor(suivi.statut_nutritionnel)">
+                  {{ getStatutNutritionnelLabel(suivi.statut_nutritionnel) }}
+                </span>
+              </td>
+              <td>
+                <span *ngIf="suivi.vaccinations_a_jour" class="badge bg-success bg-opacity-10 text-success">
+                  <i class="bi bi-check-circle me-1"></i>À jour
+                </span>
+                <span *ngIf="!suivi.vaccinations_a_jour" class="badge bg-warning bg-opacity-10 text-warning">
+                  <i class="bi bi-exclamation-circle me-1"></i>À vérifier
+                </span>
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                  <button class="btn btn-outline-primary" (click)="select(suivi)" title="Modifier">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-outline-danger" (click)="delete(suivi)" title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filteredSuivis.length === 0">
+              <td colspan="7" class="text-center py-4">
+                <div class="text-muted">
+                  <i class="bi bi-inbox display-4"></i>
+                  <p class="mt-2">Aucun suivi trouvé</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal d'ajout/édition avec design amélioré -->
+  <div *ngIf="selected" class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-gradient-primary text-white border-0">
+          <h5 class="modal-title">
+            <i class="bi me-2" [ngClass]="isEdit ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
+            {{ isEdit ? 'Modifier' : 'Ajouter' }} un suivi de santé
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="cancel()"></button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="save()" class="needs-validation" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-person me-1"></i>Nom de l'enfant
+                </label>
+                <input class="form-control" [(ngModel)]="selected.enfant_nom" name="enfant_nom" required />
+                <div class="invalid-feedback">Le nom est requis</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-person-badge me-1"></i>Prénom de l'enfant
+                </label>
+                <input class="form-control" [(ngModel)]="selected.enfant_prenom" name="enfant_prenom" required />
+                <div class="invalid-feedback">Le prénom est requis</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-calendar me-1"></i>Date de mesure
+                </label>
+                <input type="date" class="form-control" [(ngModel)]="selected.date_mesure" name="date_mesure" required />
+                <div class="invalid-feedback">La date est requise</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-person me-1"></i>ID Enfant
+                </label>
+                <input class="form-control" [(ngModel)]="selected.enfant_id" name="enfant_id" required />
+                <div class="invalid-feedback">L'ID enfant est requis</div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-speedometer2 me-1"></i>Poids (kg)
+                </label>
+                <input type="number" step="0.1" class="form-control" [(ngModel)]="selected.poids" name="poids" required min="0" max="200" />
+                <div class="invalid-feedback">Le poids doit être entre 0 et 200 kg</div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-arrows-expand me-1"></i>Taille (cm)
+                </label>
+                <input type="number" step="0.1" class="form-control" [(ngModel)]="selected.taille" name="taille" required min="0" max="250" />
+                <div class="invalid-feedback">La taille doit être entre 0 et 250 cm</div>
+              </div>
+              <div class="col-md-4">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-thermometer me-1"></i>Température (°C)
+                </label>
+                <input type="number" step="0.1" class="form-control" [(ngModel)]="selected.temperature" name="temperature" required min="30" max="45" />
+                <div class="invalid-feedback">La température doit être entre 30 et 45°C</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-heart-pulse me-1"></i>Tension artérielle
+                </label>
+                <input class="form-control" [(ngModel)]="selected.tension_arterielle" name="tension_arterielle" placeholder="ex: 120/80" required />
+                <div class="invalid-feedback">La tension artérielle est requise</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-graph-up me-1"></i>Statut nutritionnel
+                </label>
+                <select class="form-select" [(ngModel)]="selected.statut_nutritionnel" name="statut_nutritionnel" required>
+                  <option value="normal">Normal</option>
+                  <option value="insuffisant">Insuffisant</option>
+                  <option value="surpoids">Surpoids</option>
+                  <option value="obesite">Obésité</option>
+                </select>
+                <div class="invalid-feedback">Le statut nutritionnel est requis</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-shield-check me-1"></i>Vaccinations à jour
+                </label>
+                <div class="form-check">
+                  <input class="form-check-input" type="checkbox" [(ngModel)]="selected.vaccinations_a_jour" name="vaccinations_a_jour" id="vaccinations">
+                  <label class="form-check-label" for="vaccinations">
+                    Vaccinations à jour
+                  </label>
+                </div>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-clipboard-data me-1"></i>Observations
+                </label>
+                <textarea class="form-control" rows="3" [(ngModel)]="selected.observations" name="observations" required></textarea>
+                <div class="invalid-feedback">Les observations sont requises</div>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-lightbulb me-1"></i>Recommandations
+                </label>
+                <textarea class="form-control" rows="3" [(ngModel)]="selected.recommandations" name="recommandations" required></textarea>
+                <div class="invalid-feedback">Les recommandations sont requises</div>
+              </div>
+            </div>
+            <div class="mt-4 d-flex gap-2 justify-content-end">
+              <button type="button" class="btn btn-secondary" (click)="cancel()">
+                <i class="bi bi-x-circle me-1"></i>Annuler
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi me-1" [ngClass]="isEdit ? 'bi-check-circle' : 'bi-plus-circle'"></i>
+                {{ isEdit ? 'Enregistrer' : 'Ajouter' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

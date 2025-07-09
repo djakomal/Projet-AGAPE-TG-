@@ -1,0 +1,398 @@
+<div class="container-fluid">
+  <!-- En-tête avec options d'impression -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="bi bi-bar-chart me-2"></i>Rapports & Statistiques</h5>
+          <div class="btn-group" role="group">
+            <button class="btn btn-light btn-sm" (click)="showPrintOptions = !showPrintOptions">
+              <i class="bi bi-printer me-1"></i>Impression
+            </button>
+            <button class="btn btn-light btn-sm" (click)="exporterPDF()">
+              <i class="bi bi-file-pdf me-1"></i>Export PDF
+            </button>
+          </div>
+        </div>
+        
+        <!-- Options d'impression -->
+        <div class="card-body" *ngIf="showPrintOptions">
+          <div class="row">
+            <div class="col-md-3">
+              <button class="btn btn-outline-primary w-100 mb-2" (click)="imprimerRapport('globales')">
+                <i class="bi bi-printer me-1"></i>Statistiques Globales
+              </button>
+              <button class="btn btn-outline-success w-100 mb-2" (click)="genererRapport('globales')">
+                <i class="bi bi-file-text me-1"></i>Générer Rapport
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-outline-primary w-100 mb-2" (click)="imprimerRapport('classes')">
+                <i class="bi bi-printer me-1"></i>Par Classes
+              </button>
+              <button class="btn btn-outline-success w-100 mb-2" (click)="genererRapport('classes')">
+                <i class="bi bi-file-text me-1"></i>Générer Rapport
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-outline-primary w-100 mb-2" (click)="imprimerRapport('parrainage')">
+                <i class="bi bi-printer me-1"></i>Parrainage
+              </button>
+              <button class="btn btn-outline-success w-100 mb-2" (click)="genererRapport('parrainage')">
+                <i class="bi bi-file-text me-1"></i>Générer Rapport
+              </button>
+            </div>
+            <div class="col-md-3">
+              <button class="btn btn-outline-primary w-100 mb-2" (click)="imprimerRapport('annuel')">
+                <i class="bi bi-printer me-1"></i>Rapport Annuel
+              </button>
+              <button class="btn btn-outline-success w-100 mb-2" (click)="genererRapport('annuel')">
+                <i class="bi bi-file-text me-1"></i>Générer Rapport
+              </button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-3">
+              <button class="btn btn-outline-primary w-100 mb-2" (click)="imprimerRapport('exclusion')">
+                <i class="bi bi-printer me-1"></i>Risques d'Exclusion
+              </button>
+              <button class="btn btn-outline-success w-100 mb-2" (click)="genererRapport('exclusion')">
+                <i class="bi bi-file-text me-1"></i>Générer Rapport
+              </button>
+            </div>
+          </div>
+          <div class="text-center">
+            <button class="btn btn-success" (click)="imprimerTousRapports()">
+              <i class="bi bi-printer me-1"></i>Imprimer Tous les Rapports
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alertes -->
+  <div class="row mb-4" *ngIf="getAlertes().length > 0">
+    <div class="col-12">
+      <div *ngFor="let alerte of getAlertes()" class="alert alert-{{ alerte.type }} alert-dismissible fade show">
+        <i class="bi bi-exclamation-triangle me-2"></i>{{ alerte.message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onglets -->
+  <ul class="nav nav-tabs mb-4" id="rapportsTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" [class.active]="activeTab === 'globales'" 
+              (click)="activeTab = 'globales'" type="button">
+        <i class="bi bi-graph-up me-2"></i>Statistiques Globales
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" [class.active]="activeTab === 'classes'" 
+              (click)="activeTab = 'classes'" type="button">
+        <i class="bi bi-mortarboard me-2"></i>Par Classes
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" [class.active]="activeTab === 'parrainage'" 
+              (click)="activeTab = 'parrainage'" type="button">
+        <i class="bi bi-people me-2"></i>Parrainage
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" [class.active]="activeTab === 'annuel'" 
+              (click)="activeTab = 'annuel'" type="button">
+        <i class="bi bi-calendar-year me-2"></i>Rapport Annuel {{ anneeSelectionnee }}
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" [class.active]="activeTab === 'exclusion'" 
+              (click)="activeTab = 'exclusion'" type="button">
+        <i class="bi bi-exclamation-triangle me-2"></i>Risques d'Exclusion
+      </button>
+    </li>
+  </ul>
+
+  <!-- Contenu des onglets -->
+  <div class="tab-content" id="rapportsTabContent">
+    
+    <!-- Onglet Statistiques Globales -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'globales'" [class.active]="activeTab === 'globales'">
+      <div class="print-section" [class.print-active]="selectedReport === 'globales'">
+        <div class="row">
+          <!-- KPI Cards -->
+          <div class="col-md-3 mb-4">
+            <div class="card text-center">
+              <div class="card-body">
+                <h3 class="text-primary">{{ statsGlobales?.totalEnfants }}</h3>
+                <p class="card-text">Total Enfants</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="card text-center">
+              <div class="card-body">
+                <h3 class="text-success">{{ statsGlobales?.enfantsParraines }}</h3>
+                <p class="card-text">Enfants Parrainés</p>
+                <small class="text-muted">{{ statsGlobales?.tauxParrainage }}%</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="card text-center">
+              <div class="card-body">
+                <h3 class="text-info">{{ statsGlobales?.totalLettres }}</h3>
+                <p class="card-text">Total Lettres</p>
+                <small class="text-muted">{{ statsGlobales?.tauxEnvoi }}% envoyées</small>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-4">
+            <div class="card text-center">
+              <div class="card-body">
+                <h3 class="text-warning">{{ statsGlobales?.enfantsSansLettre }}</h3>
+                <p class="card-text">Sans Lettre</p>
+                <small class="text-danger" *ngIf="statsGlobales?.enfantsRisqueExclusion">
+                  {{ statsGlobales?.enfantsRisqueExclusion }} en risque
+                </small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Graphiques et détails -->
+        <div class="row">
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h6>Répartition Parrainage</h6>
+              </div>
+              <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Parrainés</span>
+                  <span class="badge bg-success">{{ statsGlobales?.enfantsParraines }}</span>
+                </div>
+                <div class="progress mb-3">
+                  <div class="progress-bar bg-success" [style.width.%]="getTauxParrainage()"></div>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Non parrainés</span>
+                  <span class="badge bg-secondary">{{ statsGlobales?.enfantsNonParraines }}</span>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-secondary" [style.width.%]="100 - getTauxParrainage()"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-6">
+            <div class="card">
+              <div class="card-header">
+                <h6>Statut des Lettres</h6>
+              </div>
+              <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Envoyées</span>
+                  <span class="badge bg-primary">{{ statsGlobales?.lettresEnvoyees }}</span>
+                </div>
+                <div class="progress mb-3">
+                  <div class="progress-bar bg-primary" [style.width.%]="getTauxEnvoi()"></div>
+                </div>
+                
+                <div class="d-flex justify-content-between mb-2">
+                  <span>Reçues</span>
+                  <span class="badge bg-success">{{ statsGlobales?.lettresRecues }}</span>
+                </div>
+                <div class="progress">
+                  <div class="progress-bar bg-success" 
+                       [style.width.%]="getPourcentageLettresRecues()"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Par Classes -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'classes'" [class.active]="activeTab === 'classes'">
+      <div class="print-section" [class.print-active]="selectedReport === 'classes'">
+        <div class="card">
+          <div class="card-header">
+            <h6>Statistiques par Classe</h6>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+              <thead>
+                <tr>
+                  <th>Classe</th>
+                  <th>Nombre</th>
+                  <th>Réussis</th>
+                  <th>Échoués</th>
+                  <th>Taux Réussite</th>
+                  <th>Parrainés</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let classe of statsClasses">
+                  <td><strong>{{ classe.nomClasse }}</strong></td>
+                  <td>{{ classe.nombreEnfants }}</td>
+                  <td><span class="badge bg-success">{{ classe.reussis }}</span></td>
+                  <td><span class="badge bg-danger">{{ classe.echoues }}</span></td>
+                  <td>
+                    <span class="badge" [ngClass]="getTauxClass(classe.tauxReussite)">
+                      {{ classe.tauxReussite }}%
+                    </span>
+                  </td>
+                  <td>{{ classe.enfantsParraines }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Parrainage -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'parrainage'" [class.active]="activeTab === 'parrainage'">
+      <div class="print-section" [class.print-active]="selectedReport === 'parrainage'">
+        <div class="card">
+          <div class="card-header">
+            <h6>Statistiques de Parrainage</h6>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+              <thead>
+                <tr>
+                  <th>Type de Parrainage</th>
+                  <th>Nombre</th>
+                  <th>Montant Total</th>
+                  <th>Montant Moyen</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let parrain of statsParrainage">
+                  <td><strong>{{ parrain.typeParrainage }}</strong></td>
+                  <td>{{ parrain.nombre }}</td>
+                  <td>{{ formatMontant(parrain.montantTotal) }}</td>
+                  <td>{{ formatMontant(parrain.montantMoyen) }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Rapport Annuel -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'annuel'" [class.active]="activeTab === 'annuel'">
+      <div class="print-section" [class.print-active]="selectedReport === 'annuel'">
+        <div class="row mb-3">
+          <div class="col-md-3">
+            <label class="form-label">Année</label>
+            <select class="form-select" [(ngModel)]="anneeSelectionnee" (change)="refresh()">
+              <option value="2024">2024</option>
+              <option value="2023">2023</option>
+              <option value="2022">2022</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header">
+            <h6>Rapport Annuel {{ anneeSelectionnee }}</h6>
+          </div>
+          <div class="card-body p-0">
+            <table class="table table-striped mb-0">
+              <thead>
+                <tr>
+                  <th>Mois</th>
+                  <th>Nouveaux Enfants</th>
+                  <th>Nouveaux Parrainages</th>
+                  <th>Lettres Envoyées</th>
+                  <th>Lettres Reçues</th>
+                  <th>Enfants Exclus</th>
+                  <th>Budget Utilisé</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let rapport of rapportAnnuel">
+                  <td><strong>{{ rapport.mois }}</strong></td>
+                  <td>{{ rapport.nouveauxEnfants }}</td>
+                  <td>{{ rapport.nouveauxParrainages }}</td>
+                  <td>{{ rapport.lettresEnvoyees }}</td>
+                  <td>{{ rapport.lettresRecues }}</td>
+                  <td>
+                    <span class="badge bg-danger" *ngIf="rapport.enfantsExclus > 0">
+                      {{ rapport.enfantsExclus }}
+                    </span>
+                    <span *ngIf="rapport.enfantsExclus === 0">0</span>
+                  </td>
+                  <td>{{ formatMontant(rapport.budgetUtilise) }}</td>
+                </tr>
+                <tr class="table-info">
+                  <td><strong>TOTAL</strong></td>
+                  <td><strong>{{ getTotalNouveauxEnfants() }}</strong></td>
+                  <td><strong>{{ getTotalNouveauxParrainages() }}</strong></td>
+                  <td><strong>{{ getTotalLettres() }}</strong></td>
+                  <td><strong>{{ getTotalLettresRecues() }}</strong></td>
+                  <td><strong>{{ getTotalEnfantsExclus() }}</strong></td>
+                  <td><strong>{{ formatMontant(getTotalBudget()) }}</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Risques d'Exclusion -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'exclusion'" [class.active]="activeTab === 'exclusion'">
+      <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Attention :</strong> Les enfants listés ci-dessous risquent d'être exclus du programme.
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h6>Enfants en Risque d'Exclusion</h6>
+        </div>
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Enfant</th>
+                <th>Dernière Lettre</th>
+                <th>Mois sans Lettre</th>
+                <th>Date d'Inscription</th>
+                <th>Motif</th>
+                <th>Recommandation</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let enfant of rapportExclusion" class="table-danger">
+                <td><strong>{{ enfant.nom }} {{ enfant.prenom }}</strong></td>
+                <td>
+                  <span *ngIf="enfant.derniereLettre; else jamaisLettre">
+                    {{ enfant.derniereLettre | date:'dd/MM/yyyy' }}
+                  </span>
+                  <ng-template #jamaisLettre>
+                    <span class="text-muted">Jamais</span>
+                  </ng-template>
+                </td>
+                <td>{{ enfant.moisSansLettre }} mois</td>
+                <td>{{ enfant.dateInscription | date:'dd/MM/yyyy' }}</td>
+                <td>{{ enfant.motifExclusion }}</td>
+                <td>{{ enfant.recommandation }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

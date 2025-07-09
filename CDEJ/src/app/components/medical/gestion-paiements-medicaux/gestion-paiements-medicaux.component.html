@@ -1,0 +1,308 @@
+<div class="container-fluid">
+  <!-- Header moderne avec statistiques -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-header bg-gradient-primary text-white border-0">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h4 class="mb-0"><i class="bi bi-cash-stack me-2"></i>Gestion Paiements Médicaux</h4>
+              <small class="opacity-75">Suivi financier des soins médicaux</small>
+            </div>
+            <button class="btn btn-light btn-sm" (click)="startAdd()">
+              <i class="bi bi-plus-circle me-1"></i>Nouveau paiement
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-3">
+              <div class="stat-card bg-primary bg-opacity-10 rounded p-3">
+                <h3 class="text-primary mb-1">{{ totalPaiements }}</h3>
+                <small class="text-muted">Total Paiements</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card bg-success bg-opacity-10 rounded p-3">
+                <h3 class="text-success mb-1">{{ formatMontant(montantTotal) }}</h3>
+                <small class="text-muted">Montant Total</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card bg-warning bg-opacity-10 rounded p-3">
+                <h3 class="text-warning mb-1">{{ paiementsEnAttente }}</h3>
+                <small class="text-muted">En Attente</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="stat-card bg-danger bg-opacity-10 rounded p-3">
+                <h3 class="text-danger mb-1">{{ formatMontant(montantEnAttente) }}</h3>
+                <small class="text-muted">Montant En Attente</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres et recherche -->
+  <div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+      <div class="row g-3">
+        <div class="col-md-3">
+          <div class="input-group">
+            <span class="input-group-text bg-light border-end-0">
+              <i class="bi bi-search text-muted"></i>
+            </span>
+            <input type="text" class="form-control border-start-0" placeholder="Rechercher..." 
+                   [(ngModel)]="searchTerm" (input)="filterPaiements()">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" [(ngModel)]="selectedStatus" (change)="filterPaiements()">
+            <option value="">Tous les statuts</option>
+            <option *ngFor="let statut of statuts" [value]="statut.value">{{ statut.label }}</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" [(ngModel)]="selectedType" (change)="filterPaiements()">
+            <option value="">Tous les types</option>
+            <option *ngFor="let type of typesPaiement" [value]="type.value">{{ type.label }}</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" [(ngModel)]="selectedMonth" (change)="filterPaiements()">
+            <option value="">Tous les mois</option>
+            <option *ngFor="let mois of mois" [value]="mois.value">{{ mois.label }}</option>
+          </select>
+        </div>
+        <div class="col-md-2">
+          <select class="form-select" [(ngModel)]="selectedYear" (change)="filterPaiements()">
+            <option value="">Toutes les années</option>
+            <option *ngFor="let annee of annees" [value]="annee.value">{{ annee.label }}</option>
+          </select>
+        </div>
+        <div class="col-md-1">
+          <button class="btn btn-outline-secondary w-100" (click)="clearFilters()">
+            <i class="bi bi-x-circle"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tableau principal avec design amélioré -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-bottom">
+      <div class="d-flex justify-content-between align-items-center">
+        <h6 class="mb-0 text-dark">
+          <i class="bi bi-table me-2"></i>Liste des paiements
+        </h6>
+        <span class="badge bg-primary">{{ filteredPaiements.length }} résultat(s)</span>
+      </div>
+    </div>
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="table-light">
+            <tr>
+              <th class="border-0">
+                <i class="bi bi-person me-1"></i>Enfant
+              </th>
+              <th class="border-0">
+                <i class="bi bi-tag me-1"></i>Type
+              </th>
+              <th class="border-0">
+                <i class="bi bi-cash me-1"></i>Montant
+              </th>
+              <th class="border-0">
+                <i class="bi bi-calendar me-1"></i>Date
+              </th>
+              <th class="border-0">
+                <i class="bi bi-credit-card me-1"></i>Mode
+              </th>
+              <th class="border-0">
+                <i class="bi bi-check-circle me-1"></i>Statut
+              </th>
+              <th class="border-0">
+                <i class="bi bi-file-text me-1"></i>Référence
+              </th>
+              <th class="border-0 text-center">
+                <i class="bi bi-gear me-1"></i>Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let paiement of filteredPaiements" class="align-middle">
+              <td>
+                <div class="fw-semibold">{{ paiement.enfant_nom }}</div>
+                <small class="text-muted">{{ paiement.description }}</small>
+              </td>
+              <td>
+                <span class="badge bg-info bg-opacity-10 text-info">
+                  {{ getTypeLabel(paiement.type_paiement) }}
+                </span>
+              </td>
+              <td>
+                <span class="fw-bold text-success">{{ formatMontant(paiement.montant) }}</span>
+              </td>
+              <td>
+                <span class="text-muted">{{ formatDate(paiement.date_paiement) }}</span>
+              </td>
+              <td>
+                <span class="badge bg-secondary bg-opacity-10 text-secondary">
+                  {{ getModeLabel(paiement.mode_paiement) }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [ngClass]="'bg-' + getStatusColor(paiement.statut)">
+                  {{ getStatusLabel(paiement.statut) }}
+                </span>
+              </td>
+              <td>
+                <small class="text-muted">{{ paiement.reference || 'N/A' }}</small>
+              </td>
+              <td class="text-center">
+                <div class="btn-group btn-group-sm" role="group">
+                  <button class="btn btn-outline-primary" (click)="select(paiement)" title="Modifier">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button *ngIf="paiement.statut === 'en_attente'" 
+                          class="btn btn-outline-success" 
+                          (click)="marquerCommePaye(paiement)" 
+                          title="Marquer comme payé">
+                    <i class="bi bi-check"></i>
+                  </button>
+                  <button *ngIf="paiement.statut === 'paye'" 
+                          class="btn btn-outline-info" 
+                          (click)="marquerCommeRembourse(paiement)" 
+                          title="Marquer comme remboursé">
+                    <i class="bi bi-arrow-return-left"></i>
+                  </button>
+                  <button *ngIf="paiement.statut !== 'annule'" 
+                          class="btn btn-outline-warning" 
+                          (click)="annulerPaiement(paiement)" 
+                          title="Annuler">
+                    <i class="bi bi-x-circle"></i>
+                  </button>
+                  <button class="btn btn-outline-danger" (click)="delete(paiement)" title="Supprimer">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            <tr *ngIf="filteredPaiements.length === 0">
+              <td colspan="8" class="text-center py-4">
+                <div class="text-muted">
+                  <i class="bi bi-inbox display-4"></i>
+                  <p class="mt-2">Aucun paiement trouvé</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal d'ajout/édition avec design amélioré -->
+  <div *ngIf="selected" class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5); z-index: 1050;">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content border-0 shadow">
+        <div class="modal-header bg-gradient-primary text-white border-0">
+          <h5 class="modal-title">
+            <i class="bi me-2" [ngClass]="isEdit ? 'bi-pencil-square' : 'bi-plus-circle'"></i>
+            {{ isEdit ? 'Modifier' : 'Ajouter' }} un paiement
+          </h5>
+          <button type="button" class="btn-close btn-close-white" (click)="cancel()"></button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="save()" class="needs-validation" novalidate>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-person me-1"></i>Nom de l'enfant
+                </label>
+                <input class="form-control" [(ngModel)]="selected.enfant_nom" name="enfant_nom" required />
+                <div class="invalid-feedback">Le nom de l'enfant est requis</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-tag me-1"></i>Type de paiement
+                </label>
+                <select class="form-select" [(ngModel)]="selected.type_paiement" name="type_paiement" required>
+                  <option *ngFor="let type of typesPaiement" [value]="type.value">{{ type.label }}</option>
+                </select>
+                <div class="invalid-feedback">Le type de paiement est requis</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-cash me-1"></i>Montant (€)
+                </label>
+                <input type="number" class="form-control" [(ngModel)]="selected.montant" name="montant" 
+                       required min="0" max="10000" step="0.01" />
+                <div class="invalid-feedback">Le montant doit être entre 0 et 10000€</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-calendar me-1"></i>Date de paiement
+                </label>
+                <input type="date" class="form-control" [(ngModel)]="selected.date_paiement" name="date_paiement" required />
+                <div class="invalid-feedback">La date de paiement est requise</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-credit-card me-1"></i>Mode de paiement
+                </label>
+                <select class="form-select" [(ngModel)]="selected.mode_paiement" name="mode_paiement" required>
+                  <option *ngFor="let mode of modesPaiement" [value]="mode.value">{{ mode.label }}</option>
+                </select>
+                <div class="invalid-feedback">Le mode de paiement est requis</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-check-circle me-1"></i>Statut
+                </label>
+                <select class="form-select" [(ngModel)]="selected.statut" name="statut" required>
+                  <option *ngFor="let statut of statuts" [value]="statut.value">{{ statut.label }}</option>
+                </select>
+                <div class="invalid-feedback">Le statut est requis</div>
+              </div>
+              <div class="col-12">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-file-text me-1"></i>Description
+                </label>
+                <textarea class="form-control" rows="2" [(ngModel)]="selected.description" name="description" required></textarea>
+                <div class="invalid-feedback">La description est requise</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-hash me-1"></i>Référence
+                </label>
+                <input class="form-control" [(ngModel)]="selected.reference" name="reference" />
+                <div class="form-text">Numéro de facture, chèque, etc.</div>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label fw-semibold">
+                  <i class="bi bi-sticky me-1"></i>Notes
+                </label>
+                <input class="form-control" [(ngModel)]="selected.notes" name="notes" />
+                <div class="form-text">Informations complémentaires</div>
+              </div>
+            </div>
+            <div class="mt-4 d-flex gap-2 justify-content-end">
+              <button type="button" class="btn btn-secondary" (click)="cancel()">
+                <i class="bi bi-x-circle me-1"></i>Annuler
+              </button>
+              <button type="submit" class="btn btn-primary">
+                <i class="bi me-1" [ngClass]="isEdit ? 'bi-check-circle' : 'bi-plus-circle'"></i>
+                {{ isEdit ? 'Enregistrer' : 'Ajouter' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

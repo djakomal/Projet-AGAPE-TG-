@@ -1,0 +1,239 @@
+<div class="container-fluid">
+  <!-- En-tête avec statistiques -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h5 class="mb-0"><i class="bi bi-envelope-paper me-2"></i>Gestion des Lettres</h5>
+          <div class="btn-group" role="group">
+            <button class="btn btn-light btn-sm" (click)="imprimerLettres()">
+              <i class="bi bi-printer me-1"></i>Imprimer
+            </button>
+            <button class="btn btn-light btn-sm" (click)="exporterPDF()">
+              <i class="bi bi-file-pdf me-1"></i>Export PDF
+            </button>
+            <button class="btn btn-light btn-sm" (click)="genererRapport()">
+              <i class="bi bi-file-text me-1"></i>Générer Rapport
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="row text-center">
+            <div class="col-md-3">
+              <div class="border rounded p-3">
+                <h4 class="text-primary">{{ statistiques.total }}</h4>
+                <small>Total Lettres</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="border rounded p-3">
+                <h4 class="text-success">{{ statistiques.envoyees }}</h4>
+                <small>Envoyées</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="border rounded p-3">
+                <h4 class="text-info">{{ statistiques.recues }}</h4>
+                <small>Reçues</small>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="border rounded p-3">
+                <h4 class="text-warning">{{ enfantsSansLettre.length }}</h4>
+                <small>Enfants sans lettre</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Onglets -->
+  <ul class="nav nav-tabs mb-4" id="lettresTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" [class.active]="activeTab === 'lettres'" 
+              (click)="activeTab = 'lettres'" type="button">
+        <i class="bi bi-envelope me-2"></i>Lettres ({{ lettres.length }})
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" [class.active]="activeTab === 'enfants-sans-lettre'" 
+              (click)="activeTab = 'enfants-sans-lettre'" type="button">
+        <i class="bi bi-exclamation-triangle me-2"></i>Enfants sans lettre ({{ enfantsSansLettre.length }})
+      </button>
+    </li>
+  </ul>
+
+  <!-- Contenu des onglets -->
+  <div class="tab-content" id="lettresTabContent">
+    
+    <!-- Onglet Lettres -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'lettres'" [class.active]="activeTab === 'lettres'">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h6>Liste des lettres</h6>
+        <button class="btn btn-success btn-sm" (click)="startAdd()">
+          <i class="bi bi-plus-circle me-1"></i>Nouvelle lettre
+        </button>
+      </div>
+
+      <!-- Tableau des lettres -->
+      <div class="card">
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Enfant</th>
+                <th>Destinataire</th>
+                <th>Type</th>
+                <th>Date Écriture</th>
+                <th>Statut</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let lettre of lettres">
+                <td>{{ lettre.enfantNom }} {{ lettre.enfantPrenom }}</td>
+                <td>{{ lettre.destinataire }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getTypeClass(lettre.type)">
+                    {{ lettre.type }}
+                  </span>
+                </td>
+                <td>{{ lettre.dateEcriture | date:'dd/MM/yyyy' }}</td>
+                <td>
+                  <span class="badge" [ngClass]="getStatutClass(lettre.statut)">
+                    {{ lettre.statut }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-primary btn-sm me-1" (click)="selectLettre(lettre)">
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-success btn-sm me-1" *ngIf="lettre.statut === 'brouillon'" 
+                          (click)="envoyerLettre(lettre)">
+                    <i class="bi bi-send"></i>
+                  </button>
+                  <button class="btn btn-info btn-sm me-1" *ngIf="lettre.statut === 'envoyee'" 
+                          (click)="marquerRecue(lettre)">
+                    <i class="bi bi-check-circle"></i>
+                  </button>
+                  <button class="btn btn-danger btn-sm" (click)="deleteLettre(lettre)">
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Enfants sans lettre -->
+    <div class="tab-pane fade" [class.show]="activeTab === 'enfants-sans-lettre'" [class.active]="activeTab === 'enfants-sans-lettre'">
+      <div class="alert alert-warning">
+        <i class="bi bi-exclamation-triangle me-2"></i>
+        <strong>Attention :</strong> Les enfants qui n'écrivent pas de lettre depuis plus de 6 mois risquent d'être exclus du programme.
+      </div>
+
+      <div class="card">
+        <div class="card-body p-0">
+          <table class="table table-striped mb-0">
+            <thead>
+              <tr>
+                <th>Enfant</th>
+                <th>Dernière lettre</th>
+                <th>Mois sans lettre</th>
+                <th>Risque d'exclusion</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let enfant of enfantsSansLettre" [ngClass]="{'table-danger': enfant.risqueExclusion}">
+                <td>{{ enfant.nom }} {{ enfant.prenom }}</td>
+                <td>
+                  <span *ngIf="enfant.derniereLettre; else jamaisLettre">
+                    {{ enfant.derniereLettre | date:'dd/MM/yyyy' }}
+                  </span>
+                  <ng-template #jamaisLettre>
+                    <span class="text-muted">Jamais</span>
+                  </ng-template>
+                </td>
+                <td>{{ enfant.moisSansLettre }} mois</td>
+                <td>
+                  <span class="badge" [ngClass]="getRisqueClass(enfant.risqueExclusion)">
+                    <i class="bi" [ngClass]="enfant.risqueExclusion ? 'bi-exclamation-triangle' : 'bi-clock'"></i>
+                    {{ enfant.risqueExclusion ? 'RISQUE EXCLUSION' : 'À surveiller' }}
+                  </span>
+                </td>
+                <td>
+                  <button class="btn btn-success btn-sm" (click)="startAdd(); selectedLettre!.enfantId = enfant.enfantId">
+                    <i class="bi bi-plus-circle me-1"></i>Créer lettre
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal pour ajouter/modifier une lettre -->
+  <div *ngIf="selectedLettre" class="modal fade show d-block" style="background-color: rgba(0,0,0,0.5);">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">{{ isEdit ? 'Modifier' : 'Nouvelle' }} lettre</h5>
+          <button type="button" class="btn-close" (click)="cancel()"></button>
+        </div>
+        <div class="modal-body">
+          <form (ngSubmit)="saveLettre()">
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">Enfant</label>
+                <select class="form-select" [(ngModel)]="selectedLettre.enfantId" name="enfantId" required>
+                  <option value="">Sélectionner un enfant</option>
+                  <option *ngFor="let enfant of enfants" [value]="enfant.id">
+                    {{ enfant.nom }} {{ enfant.prenom }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Destinataire</label>
+                <input class="form-control" [(ngModel)]="selectedLettre.destinataire" name="destinataire" required />
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Type de lettre</label>
+                <select class="form-select" [(ngModel)]="selectedLettre.type" name="type">
+                  <option value="remerciement">Remerciement</option>
+                  <option value="demande">Demande</option>
+                  <option value="nouvelle">Nouvelle</option>
+                  <option value="autre">Autre</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Statut</label>
+                <select class="form-select" [(ngModel)]="selectedLettre.statut" name="statut">
+                  <option value="brouillon">Brouillon</option>
+                  <option value="envoyee">Envoyée</option>
+                  <option value="recue">Reçue</option>
+                </select>
+              </div>
+              <div class="col-12">
+                <label class="form-label">Contenu</label>
+                <textarea class="form-control" rows="8" [(ngModel)]="selectedLettre.contenu" name="contenu" required></textarea>
+              </div>
+            </div>
+            <div class="mt-3">
+              <button type="submit" class="btn btn-success me-2">
+                {{ isEdit ? 'Enregistrer' : 'Ajouter' }}
+              </button>
+              <button type="button" class="btn btn-secondary" (click)="cancel()">Annuler</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
