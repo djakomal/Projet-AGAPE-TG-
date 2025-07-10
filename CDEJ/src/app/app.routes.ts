@@ -3,6 +3,8 @@ import { LoginComponent } from './pages/login/login.component';
 
 import { ProfileComponent } from './pages/profile/profile.component';
 import { ForgotPasswordComponent } from './pages/forgot-password/forgot-password.component';
+import { RegisterComponent } from './pages/register/register.component';
+import { ConfirmComponent } from './pages/confirm/confirm.component';
 
 import { GestionScolariteComponent } from './components/social/gestion-scolarite/gestion-scolarite.component';
 import { GestionParrainageComponent } from './components/social/gestion-parrainage/gestion-parrainage.component';
@@ -32,6 +34,8 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
 export const routes: Routes = [
   { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
+  { path: 'confirm', component: ConfirmComponent },
   { path: 'forgot-password', component: ForgotPasswordComponent },
   {
     path: 'dashboard',

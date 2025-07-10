@@ -1,1 +1,151 @@
-<p>profile works!</p>
+<div class="profile-container">
+  <div class="profile-header">
+    <h2>Mon Profil</h2>
+    <p>Gérez vos informations personnelles et votre mot de passe</p>
+  </div>
+
+  <div class="profile-content">
+    <!-- Informations utilisateur -->
+    <div class="profile-card">
+      <div class="card-header">
+        <h3><i class="bi bi-person-circle"></i> Informations personnelles</h3>
+      </div>
+      <div class="card-body">
+        <div class="user-avatar-large">
+          <i class="bi bi-person-circle"></i>
+        </div>
+        <div class="user-info-grid">
+          <div class="info-item">
+            <label>Nom complet</label>
+            <span>{{ userNom || 'Non défini' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Email</label>
+            <span>{{ userEmail || 'Non défini' }}</span>
+          </div>
+          <div class="info-item">
+            <label>Rôle</label>
+            <span class="role-badge">{{ getRoleDisplayName(userRole) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Changement de mot de passe -->
+    <div class="profile-card">
+      <div class="card-header">
+        <h3><i class="bi bi-shield-lock"></i> Sécurité</h3>
+        <button 
+          class="btn btn-outline-primary btn-sm" 
+          (click)="togglePasswordForm()"
+        >
+          <i class="bi" [class.bi-pencil]="!showPasswordForm" [class.bi-x]="showPasswordForm"></i>
+          {{ showPasswordForm ? 'Annuler' : 'Changer le mot de passe' }}
+        </button>
+      </div>
+      
+      <div class="card-body" *ngIf="showPasswordForm">
+        <form (ngSubmit)="changePassword()" #passwordForm="ngForm">
+          <div class="form-group">
+            <label for="oldPassword">Ancien mot de passe</label>
+            <input 
+              type="password" 
+              id="oldPassword" 
+              class="form-control" 
+              [(ngModel)]="oldPassword" 
+              name="oldPassword" 
+              required 
+              [disabled]="isChangingPassword"
+              (input)="clearMessages()"
+            />
+          </div>
+
+          <div class="form-group">
+            <label for="newPassword">Nouveau mot de passe</label>
+            <input 
+              type="password" 
+              id="newPassword" 
+              class="form-control" 
+              [(ngModel)]="newPassword" 
+              name="newPassword" 
+              required 
+              minlength="6"
+              [disabled]="isChangingPassword"
+              (input)="clearMessages()"
+            />
+            <small class="form-text text-muted">
+              Le mot de passe doit contenir au moins 6 caractères
+            </small>
+          </div>
+
+          <div class="form-group">
+            <label for="confirmPassword">Confirmer le nouveau mot de passe</label>
+            <input 
+              type="password" 
+              id="confirmPassword" 
+              class="form-control" 
+              [(ngModel)]="confirmPassword" 
+              name="confirmPassword" 
+              required 
+              [disabled]="isChangingPassword"
+              (input)="clearMessages()"
+            />
+          </div>
+
+          <!-- Messages d'erreur et de succès -->
+          <div class="alert alert-danger" *ngIf="passwordError" role="alert">
+            <i class="bi bi-exclamation-triangle"></i>
+            {{ passwordError }}
+          </div>
+
+          <div class="alert alert-success" *ngIf="passwordSuccess" role="alert">
+            <i class="bi bi-check-circle"></i>
+            {{ passwordSuccess }}
+          </div>
+
+          <button 
+            type="submit" 
+            class="btn btn-primary" 
+            [disabled]="isChangingPassword || !oldPassword || !newPassword || !confirmPassword"
+          >
+            <span *ngIf="!isChangingPassword">
+              <i class="bi bi-shield-check"></i>
+              Changer le mot de passe
+            </span>
+            <span *ngIf="isChangingPassword">
+              <i class="bi bi-arrow-clockwise spin"></i>
+              Changement en cours...
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- Informations de sécurité -->
+    <div class="profile-card">
+      <div class="card-header">
+        <h3><i class="bi bi-info-circle"></i> Conseils de sécurité</h3>
+      </div>
+      <div class="card-body">
+        <div class="security-tips">
+          <div class="tip-item">
+            <i class="bi bi-check-circle text-success"></i>
+            <span>Utilisez un mot de passe fort avec au moins 6 caractères</span>
+          </div>
+          <div class="tip-item">
+            <i class="bi bi-check-circle text-success"></i>
+            <span>Ne partagez jamais votre mot de passe</span>
+          </div>
+          <div class="tip-item">
+            <i class="bi bi-check-circle text-success"></i>
+            <span>Déconnectez-vous après chaque session</span>
+          </div>
+          <div class="tip-item">
+            <i class="bi bi-check-circle text-success"></i>
+            <span>Changez régulièrement votre mot de passe</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -35,6 +35,52 @@
     </div>
   </div>
 
+  <!-- Section gestion des agents -->
+  <div class="agents-section">
+    <div class="agents-card">
+      <div class="agents-header">
+        <h2><i class="bi bi-people"></i> Gestion des agents</h2>
+        <p>Modifier l'email ou le mot de passe de chaque agent</p>
+      </div>
+      <div class="agents-table-wrapper">
+        <table class="table table-hover agents-table">
+          <thead>
+            <tr>
+              <th>Nom</th>
+              <th>Email</th>
+              <th>Rôle</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let agent of agents; let i = index">
+              <td>{{ agent.nom }}</td>
+              <td *ngIf="agentEditIndex !== i">{{ agent.email }}</td>
+              <td *ngIf="agentEditIndex === i">
+                <input type="email" class="form-control" [(ngModel)]="agentEditEmail" />
+              </td>
+              <td>{{ agent.role | titlecase }}</td>
+              <td>
+                <ng-container *ngIf="agentEditIndex !== i">
+                  <button class="btn btn-outline-primary btn-sm" (click)="startEditAgent(i)"><i class="bi bi-pencil"></i> Modifier</button>
+                </ng-container>
+                <ng-container *ngIf="agentEditIndex === i">
+                  <input type="password" class="form-control mb-1" placeholder="Nouveau mot de passe (optionnel)" [(ngModel)]="agentEditPassword" />
+                  <div class="d-flex gap-2">
+                    <button class="btn btn-success btn-sm" (click)="saveAgentEdit(i)"><i class="bi bi-check"></i> Enregistrer</button>
+                    <button class="btn btn-secondary btn-sm" (click)="cancelEditAgent()"><i class="bi bi-x"></i> Annuler</button>
+                  </div>
+                  <div *ngIf="agentEditError" class="alert alert-danger mt-2 py-1 px-2">{{ agentEditError }}</div>
+                  <div *ngIf="agentEditSuccess" class="alert alert-success mt-2 py-1 px-2">{{ agentEditSuccess }}</div>
+                </ng-container>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
   <!-- Formulaire amélioré -->
   <div class="form-section" [class.collapsed]="!showForm">
     <div class="form-card">

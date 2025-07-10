@@ -1,8 +1,17 @@
 <nav class="navbar navbar-expand-lg navbar-light bg-light px-3">
-  <a class="navbar-brand" href="#"></a>
+  <a class="navbar-brand" href="#">
+    <i class="bi bi-building"></i>
+    CDEJ
+  </a>
+  
   <div class="ms-auto d-flex align-items-center">
+    <!-- Boîte de réception -->
     <div class="position-relative me-3">
-      <button class="btn btn-link p-0 position-relative" (click)="showInbox = !showInbox" title="Boîte de réception">
+      <button 
+        class="btn btn-link p-0 position-relative inbox-btn" 
+        (click)="showInbox = !showInbox" 
+        title="Boîte de réception"
+      >
         <i class="bi bi-envelope fs-4"></i>
         <span *ngIf="(inboxCount$ | async) as count">
           <span *ngIf="count > 0" class="inbox-badge">{{ count }}</span>
@@ -12,7 +21,50 @@
         <app-chat-inbox></app-chat-inbox>
       </div>
     </div>
-    <span class="me-3">Rôle : <strong>{{ userRole || 'Non connecté' }}</strong></span>
-    <button class="btn btn-outline-danger btn-sm" (click)="logout()">Déconnexion</button>
+
+    <!-- Menu utilisateur -->
+    <div class="user-menu-container">
+      <button 
+        class="btn btn-link user-menu-btn" 
+        (click)="toggleUserMenu()"
+        title="Menu utilisateur"
+      >
+        <div class="user-info">
+          <div class="user-avatar">
+            <i class="bi bi-person-circle"></i>
+          </div>
+          <div class="user-details">
+            <div class="user-name">{{ userNom || 'Utilisateur' }}</div>
+            <div class="user-role">{{ getRoleDisplayName(userRole) }}</div>
+          </div>
+          <i class="bi bi-chevron-down"></i>
+        </div>
+      </button>
+      
+      <div *ngIf="showUserMenu" class="user-dropdown">
+        <div class="dropdown-header">
+          <div class="user-avatar-large">
+            <i class="bi bi-person-circle"></i>
+          </div>
+          <div class="user-info-large">
+            <div class="user-name-large">{{ userNom || 'Utilisateur' }}</div>
+            <div class="user-email">{{ userEmail }}</div>
+            <div class="user-role-large">{{ getRoleDisplayName(userRole) }}</div>
+          </div>
+        </div>
+        <div class="dropdown-divider"></div>
+        <button class="dropdown-item" (click)="navigateToProfile()">
+          <i class="bi bi-person-circle"></i>
+          Mon profil
+        </button>
+        <button class="dropdown-item" (click)="logout()">
+          <i class="bi bi-box-arrow-right"></i>
+          Se déconnecter
+        </button>
+      </div>
+    </div>
   </div>
 </nav>
+
+<!-- Overlay pour fermer le menu -->
+<div *ngIf="showUserMenu" class="menu-overlay" (click)="closeUserMenu()"></div>

@@ -1,0 +1,41 @@
+<div class="confirm-container">
+  <div class="confirm-card">
+    <div class="confirm-header">
+      <div class="confirm-icon">
+        <i class="bi" [ngClass]="success ? 'bi-check-circle-fill text-success' : 'bi-exclamation-circle-fill text-warning'"></i>
+      </div>
+      <h2>{{ success ? 'Compte activé !' : 'Confirmation du compte' }}</h2>
+    </div>
+
+    <div class="confirm-content">
+      <div *ngIf="isLoading" class="loading-section">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+        <p class="mt-3">Activation de votre compte en cours...</p>
+      </div>
+
+      <div *ngIf="!isLoading && success" class="success-section">
+        <div class="success-message">
+          <i class="bi bi-check-circle-fill text-success"></i>
+          <p>{{ message }}</p>
+        </div>
+        <button class="btn btn-primary" (click)="goToLogin()">
+          <i class="bi bi-box-arrow-in-right"></i>
+          Aller à la page de connexion
+        </button>
+      </div>
+
+      <div *ngIf="!isLoading && error" class="error-section">
+        <div class="error-message">
+          <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+          <p>{{ error }}</p>
+        </div>
+        <button class="btn btn-outline-primary" (click)="goToLogin()">
+          <i class="bi bi-arrow-left"></i>
+          Retour à la connexion
+        </button>
+      </div>
+    </div>
+  </div>
+</div> 

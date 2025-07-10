@@ -687,3 +687,134 @@
     justify-content: center;
   }
 }
+
+.agents-section {
+  margin: 32px 0 24px 0;
+}
+
+.agents-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.08);
+  padding: 32px 24px;
+  margin-bottom: 24px;
+}
+
+.agents-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.agents-header h2 {
+  font-size: 22px;
+  font-weight: 600;
+  color: #667eea;
+  margin: 0;
+}
+
+.agents-header p {
+  color: #666;
+  font-size: 14px;
+  margin: 0;
+}
+
+.agents-table-wrapper {
+  overflow-x: auto;
+}
+
+.agents-table {
+  width: 100%;
+  min-width: 500px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.agents-table th, .agents-table td {
+  padding: 12px 10px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.agents-table th {
+  background: #f1f3f4;
+  color: #333;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 2px solid #e1e5e9;
+}
+
+.agents-table td {
+  font-size: 15px;
+  color: #444;
+  background: #fff;
+}
+
+.agents-table tr {
+  transition: background 0.2s;
+}
+
+.agents-table tr:hover {
+  background: #eef2ff;
+}
+
+.agents-table input.form-control {
+  font-size: 14px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1.5px solid #e1e5e9;
+  background: #f8f9fa;
+  margin-bottom: 0;
+}
+
+.agents-table .btn {
+  font-size: 13px;
+  padding: 5px 10px;
+  border-radius: 6px;
+  margin-right: 4px;
+}
+
+.agents-table .btn-success {
+  background: linear-gradient(135deg, #667eea 0%, #16a34a 100%);
+  border: none;
+  color: #fff;
+}
+
+.agents-table .btn-outline-primary {
+  border: 1.5px solid #667eea;
+  color: #667eea;
+  background: #fff;
+}
+
+.agents-table .btn-outline-primary:hover {
+  background: #667eea;
+  color: #fff;
+}
+
+.agents-table .btn-secondary {
+  background: #f1f3f4;
+  color: #333;
+  border: none;
+}
+
+.agents-table .btn-secondary:hover {
+  background: #e1e5e9;
+}
+
+.alert {
+  border-radius: 6px;
+  font-size: 13px;
+  padding: 6px 10px;
+  margin: 0;
+}
+
+@media (max-width: 700px) {
+  .agents-card {
+    padding: 18px 6px;
+  }
+  .agents-table {
+    min-width: 350px;
+  }
+}

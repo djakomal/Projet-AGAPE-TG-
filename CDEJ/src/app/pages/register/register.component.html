@@ -1,0 +1,162 @@
+ 
+    <div class="register-card">
+      <div class="register-header">
+        <h2>Créer un compte agent</h2>
+        <p>Remplissez les informations pour créer votre compte</p>
+      </div>
+  
+      <form (ngSubmit)="onSubmit()" #registerForm="ngForm">
+        <div class="form-group">
+          <label for="nom" class="form-label">
+            <i class="bi bi-person"></i>
+            Nom complet *
+          </label>
+          <input 
+            type="text" 
+            id="nom" 
+            class="form-control" 
+            [(ngModel)]="nom" 
+            name="nom" 
+            required 
+            (input)="clearMessages()"
+            [disabled]="isLoading"
+            placeholder="Ex: Jean Dupont"
+          />
+          <div class="invalid-feedback" *ngIf="error && !nom">
+            Le nom est requis
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="email" class="form-label">
+            <i class="bi bi-envelope"></i>
+            Email *
+          </label>
+          <input 
+            type="email" 
+            id="email" 
+            class="form-control" 
+            [(ngModel)]="email" 
+            name="email" 
+            required 
+            (input)="clearMessages()"
+            [disabled]="isLoading"
+            placeholder="Ex: jean.dupont@cdej.com"
+          />
+          <div class="invalid-feedback" *ngIf="error && !email">
+            L'email est requis et doit être valide
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="role" class="form-label">
+            <i class="bi bi-person-badge"></i>
+            Rôle *
+          </label>
+          <select 
+            id="role" 
+            class="form-control" 
+            [(ngModel)]="role" 
+            name="role" 
+            required 
+            (change)="clearMessages()"
+            [disabled]="isLoading"
+          >
+            <option value="">Sélectionner un rôle</option>
+            <option value="agent_social">👥 Agent Social</option>
+            <option value="agent_medical">🏥 Agent Médical</option>
+            <option value="comptable">💰 Comptable</option>
+          </select>
+          <div class="invalid-feedback" *ngIf="error && !role">
+            Le rôle est requis
+          </div>
+        </div>
+  
+        <div class="form-group">
+          <label for="password" class="form-label">
+            <i class="bi bi-shield-lock"></i>
+            Mot de passe *
+          </label>
+          <input 
+            type="password" 
+            id="password" 
+            class="form-control" 
+            [(ngModel)]="password" 
+            name="password" 
+            required 
+            minlength="6"
+            (input)="clearMessages()"
+            [disabled]="isLoading"
+            placeholder="Minimum 6 caractères"
+          />
+          <small class="form-text text-muted">
+            <i class="bi bi-info-circle"></i>
+            Le mot de passe doit contenir au moins 6 caractères
+          </small>
+        </div>
+  
+        <div class="form-group">
+          <label for="confirmPassword" class="form-label">
+            <i class="bi bi-shield-check"></i>
+            Confirmer le mot de passe *
+          </label>
+          <input 
+            type="password" 
+            id="confirmPassword" 
+            class="form-control" 
+            [(ngModel)]="confirmPassword" 
+            name="confirmPassword" 
+            required 
+            (input)="clearMessages()"
+            [disabled]="isLoading"
+            placeholder="Répétez votre mot de passe"
+          />
+          <div class="invalid-feedback" *ngIf="error && password !== confirmPassword">
+            Les mots de passe ne correspondent pas
+          </div>
+        </div>
+  
+        <!-- Messages d'erreur et de succès -->
+        <div class="alert alert-danger" *ngIf="error" role="alert">
+          <i class="bi bi-exclamation-triangle"></i>
+          {{ error }}
+        </div>
+  
+        <div class="alert alert-success" *ngIf="success" role="alert">
+          <i class="bi bi-check-circle"></i>
+          {{ success }}
+        </div>
+  
+        <button 
+          type="submit" 
+          class="btn btn-primary w-100 register-btn" 
+          [disabled]="isLoading || !nom || !email || !password || !confirmPassword || !role"
+        >
+          <span *ngIf="!isLoading">
+            <i class="bi bi-person-plus"></i>
+            Créer le compte
+          </span>
+          <span *ngIf="isLoading">
+            <i class="bi bi-arrow-clockwise spin"></i>
+            Création en cours...
+          </span>
+        </button>
+      </form>
+  
+      <!-- Lien vers la connexion -->
+      <div class="login-link text-center mt-4">
+        <span>Déjà un compte ?</span>
+        <a class="ms-2" routerLink="/login">Se connecter</a>
+      </div>
+  
+      <!-- Informations de sécurité -->
+      <div class="security-info mt-4">
+        <h6><i class="bi bi-shield-check"></i> Sécurité</h6>
+        <ul class="security-list">
+          <li><i class="bi bi-check-circle text-success"></i> Votre compte sera activé après confirmation par email</li>
+          <li><i class="bi bi-check-circle text-success"></i> Vos données sont protégées et sécurisées</li>
+          <li><i class="bi bi-check-circle text-success"></i> Seuls les agents peuvent créer un compte</li>
+        </ul>
+      </div>
+    </div>
+  </div>

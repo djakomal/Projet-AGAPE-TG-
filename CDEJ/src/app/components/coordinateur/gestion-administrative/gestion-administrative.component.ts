@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ChatService } from '../../../services/chat.service';
 import { NotificationsService } from '../../../services/notifications.service';
+import { AuthService } from '../../../services/auth.service';
 
 interface TacheAdministrative {
   id: number;
@@ -37,7 +38,20 @@ export class GestionAdministrativeComponent implements OnInit {
     { value: 'comptable', label: 'Secteur Comptable' }
   ];
 
-  constructor(private fb: FormBuilder, private chat: ChatService, private notifications: NotificationsService) {
+  // Gestion des agents
+  agents: any[] = [];
+  agentEditIndex: number | null = null;
+  agentEditEmail = '';
+  agentEditPassword = '';
+  agentEditError = '';
+  agentEditSuccess = '';
+
+  constructor(
+    private fb: FormBuilder,
+    private chat: ChatService,
+    private notifications: NotificationsService,
+    private auth: AuthService
+  ) {
     this.tacheForm = this.fb.group({
       titre: ['', Validators.required],
       description: ['', Validators.required],
@@ -49,6 +63,7 @@ export class GestionAdministrativeComponent implements OnInit {
 
   ngOnInit(): void {
     this.chargerTaches();
+    this.chargerAgents();
   }
 
   chargerTaches(): void {
@@ -82,6 +97,60 @@ export class GestionAdministrativeComponent implements OnInit {
         assigne: 'agent_medical'
       }
     ];
+  }
+
+  // Gestion des agents
+  chargerAgents() {
+    this.agents = this.auth.getAllUsers().filter(u => u.role !== 'coordinateur');
+  }
+
+  startEditAgent(i: number) {
+    this.agentEditIndex = i;
+    this.agentEditEmail = this.agents[i].email;
+    this.agentEditPassword = '';
+    this.agentEditError = '';
+    this.agentEditSuccess = '';
+  }
+
+  cancelEditAgent() {
+    this.agentEditIndex = null;
+    this.agentEditEmail = '';
+    this.agentEditPassword = '';
+    this.agentEditError = '';
+    this.agentEditSuccess = '';
+  }
+
+  saveAgentEdit(i: number) {
+    const original = this.agents[i];
+    this.agentEditError = '';
+    this.agentEditSuccess = '';
+    // Changement email
+    if (this.agentEditEmail !== original.email) {
+      const res = this.auth.updateUserEmail(original.email, this.agentEditEmail);
+      if (!res.success) {
+        this.agentEditError = res.error || 'Erreur lors du changement d\'email';
+        return;
+      } else {
+        this.agents[i].email = this.agentEditEmail;
+      }
+    }
+    // Changement mot de passe
+    if (this.agentEditPassword) {
+      if (this.agentEditPassword.length < 6) {
+        this.agentEditError = 'Le mot de passe doit contenir au moins 6 caractères';
+        return;
+      }
+      const res = this.auth.adminChangePassword(this.agentEditEmail, this.agentEditPassword);
+      if (!res.success) {
+        this.agentEditError = res.error || 'Erreur lors du changement de mot de passe';
+        return;
+      }
+    }
+    this.agentEditSuccess = 'Modifications enregistrées';
+    setTimeout(() => {
+      this.cancelEditAgent();
+      this.chargerAgents();
+    }, 1200);
   }
 
   toggleForm(): void {

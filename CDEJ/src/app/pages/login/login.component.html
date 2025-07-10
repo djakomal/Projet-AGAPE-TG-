@@ -1,15 +1,152 @@
-<div class="container mt-5" style="max-width: 400px;">
-  <h2 class="mb-4 text-center">Connexion</h2>
-  <form (ngSubmit)="onSubmit()">
-    <div class="mb-3">
-      <label for="email" class="form-label">Email</label>
-      <input type="email" id="email" class="form-control" [(ngModel)]="email" name="email" required />
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h2>Connexion </h2>
+      <p>Connectez-vous à votre espace de travail</p>
     </div>
-    <div class="mb-3">
-      <label for="password" class="form-label">Mot de passe</label>
-      <input type="password" id="password" class="form-control" [(ngModel)]="password" name="password" required />
+
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-group">
+        <label for="email" class="form-label">Email</label>
+        <input 
+          type="email" 
+          id="email" 
+          class="form-control" 
+          [(ngModel)]="email" 
+          name="email" 
+          required 
+          [class.is-invalid]="error && !email"
+          (input)="clearError()"
+          [disabled]="isLoading"
+        />
+        <div class="invalid-feedback" *ngIf="error && !email">
+          L'email est requis
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password" class="form-label">Mot de passe</label>
+        <div class="password-input-group">
+          <input 
+            [type]="showPassword ? 'text' : 'password'" 
+            id="password" 
+            class="form-control" 
+            [(ngModel)]="password" 
+            name="password" 
+            required 
+            [class.is-invalid]="error && !password"
+            (input)="clearError()"
+            [disabled]="isLoading"
+          />
+          <button 
+            type="button" 
+            class="password-toggle" 
+            (click)="togglePasswordVisibility()"
+            [disabled]="isLoading"
+          >
+            <i class="fas" [class.fa-eye]="!showPassword" [class.fa-eye-slash]="showPassword"></i>
+          </button>
+        </div>
+        <div class="invalid-feedback" *ngIf="error && !password">
+          Le mot de passe est requis
+        </div>
+      </div>
+
+      <!-- Messages d'erreur et de succès -->
+      <div class="alert alert-danger" *ngIf="error" role="alert">
+        <i class="fas fa-exclamation-triangle"></i>
+        {{ error }}
+      </div>
+
+      <div class="alert alert-success" *ngIf="success" role="alert">
+        <i class="fas fa-check-circle"></i>
+        {{ success }}
+      </div>
+
+      <button 
+        type="submit" 
+        class="btn btn-primary w-100 login-btn" 
+        [disabled]="isLoading || !email || !password"
+      >
+        <span *ngIf="!isLoading">
+          <i class="fas fa-sign-in-alt"></i>
+          Se connecter
+        </span>
+        <span *ngIf="isLoading">
+          <i class="fas fa-spinner fa-spin"></i>
+          Connexion en cours...
+        </span>
+      </button>
+    </form>
+
+    <!-- Section de test rapide -->
+    <div class="test-accounts">
+      <h6>Comptes de test :</h6>
+      <div class="test-buttons">
+        <button 
+          type="button" 
+          class="btn btn-outline-secondary btn-sm" 
+          (click)="fillTestAccount('coordinateur')"
+          [disabled]="isLoading"
+        >
+          Coordinateur
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-outline-secondary btn-sm" 
+          (click)="fillTestAccount('social')"
+          [disabled]="isLoading"
+        >
+          Social
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-outline-secondary btn-sm" 
+          (click)="fillTestAccount('medical')"
+          [disabled]="isLoading"
+        >
+          Médical
+        </button>
+        <button 
+          type="button" 
+          class="btn btn-outline-secondary btn-sm" 
+          (click)="fillTestAccount('comptable')"
+          [disabled]="isLoading"
+        >
+          Comptable
+        </button>
+      </div>
     </div>
-    <div *ngIf="error" class="alert alert-danger">{{ error }}</div>
-    <button type="submit" class="btn btn-primary w-100">Se connecter</button>
-  </form>
+
+    <!-- Lien inscription -->
+    <div class="register-link text-center mt-4">
+      <span>Pas de compte ?</span>
+      <a class="ms-2" (click)="goToRegister()" style="cursor:pointer;">Créer un compte</a>
+    </div>
+
+    <!-- Lien renvoi confirmation -->
+    <div class="resend-link text-center mt-2">
+      <span>Pas reçu l'email de confirmation ?</span>
+      <a class="ms-2" (click)="showResendForm = true" style="cursor:pointer;">Renvoyer</a>
+    </div>
+
+    <!-- Formulaire renvoi email -->
+    <div *ngIf="showResendForm" class="resend-form mt-3">
+      <div class="form-group">
+        <label for="resendEmail">Email</label>
+        <input type="email" id="resendEmail" class="form-control" [(ngModel)]="resendEmail" name="resendEmail" />
+      </div>
+      <div class="d-flex gap-2">
+        <button class="btn btn-outline-primary btn-sm" (click)="resendConfirmation()" [disabled]="!resendEmail">
+          <i class="bi bi-envelope"></i> Renvoyer
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" (click)="showResendForm = false">
+          <i class="bi bi-x"></i> Annuler
+        </button>
+      </div>
+      <div *ngIf="resendMessage" class="alert mt-2" [ngClass]="resendSuccess ? 'alert-success' : 'alert-danger'">
+        {{ resendMessage }}
+      </div>
+    </div>
+  </div>
 </div>
