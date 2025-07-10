@@ -1,1 +1,323 @@
-<p>suivi-equipes works!</p>
+<div class="suivi-equipes">
+  <div class="header">
+    <h2>Suivi des Équipes</h2>
+    <p>Gérez les équipes et suivez les performances de vos collaborateurs</p>
+  </div>
+
+  <!-- Vue d'ensemble des équipes -->
+  <div class="overview-section">
+    <div class="section-header">
+      <h3>Vue d'ensemble des équipes</h3>
+      <button class="btn btn-primary" (click)="isEditingEquipe = true; isEditingMembre = false">
+        + Nouvelle équipe
+      </button>
+    </div>
+
+    <div class="teams-grid">
+      <div 
+        *ngFor="let equipe of equipes" 
+        class="team-card"
+        [ngClass]="getStatutClass(equipe.statut)">
+        <div class="team-header">
+          <h4>{{ equipe.nom }}</h4>
+          <div class="team-actions">
+            <button 
+              class="btn-icon"
+              (click)="modifierEquipe(equipe)"
+              title="Modifier l'équipe">
+              ✏️
+            </button>
+            <button 
+              class="btn-icon"
+              (click)="supprimerEquipe(equipe.id)"
+              title="Supprimer l'équipe">
+              🗑️
+            </button>
+          </div>
+        </div>
+
+        <div class="team-content">
+          <div class="team-info">
+            <div class="info-item">
+              <span class="label">Responsable:</span>
+              <span class="value">{{ equipe.responsable }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Domaine:</span>
+              <span class="value">{{ equipe.domaine }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Membres:</span>
+              <span class="value">{{ equipe.nombreMembres }} personnes</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Projets en cours:</span>
+              <span class="value">{{ equipe.projetsEnCours }}</span>
+            </div>
+          </div>
+
+          <div class="performance-section">
+            <div class="performance-bar">
+              <div class="performance-fill" 
+                   [ngClass]="getPerformanceClass(equipe.performance)"
+                   [style.width.%]="equipe.performance">
+              </div>
+            </div>
+            <span class="performance-text">{{ equipe.performance }}%</span>
+          </div>
+
+          <div class="team-status">
+            <span class="badge" [ngClass]="getStatutClass(equipe.statut)">
+              {{ equipe.statut }}
+            </span>
+          </div>
+
+          <button 
+            class="btn btn-outline"
+            (click)="filtrerParEquipe(equipe.nom)">
+            Voir les membres
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulaire d'équipe -->
+  <div class="form-section" *ngIf="isEditingEquipe">
+    <div class="card">
+      <div class="card-header">
+        <h3>{{ editingEquipeId ? 'Modifier l\'équipe' : 'Nouvelle équipe' }}</h3>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="equipeForm" (ngSubmit)="editingEquipeId ? sauvegarderEquipe() : ajouterEquipe()">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="nomEquipe">Nom de l'équipe *</label>
+              <input 
+                type="text" 
+                id="nomEquipe" 
+                formControlName="nom" 
+                class="form-control"
+                placeholder="Nom de l'équipe">
+            </div>
+            <div class="form-group">
+              <label for="responsable">Responsable *</label>
+              <input 
+                type="text" 
+                id="responsable" 
+                formControlName="responsable" 
+                class="form-control"
+                placeholder="Nom du responsable">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="domaine">Domaine d'activité *</label>
+            <input 
+              type="text" 
+              id="domaine" 
+              formControlName="domaine" 
+              class="form-control"
+              placeholder="Domaine d'activité">
+          </div>
+
+          <div class="form-actions">
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="!equipeForm.valid">
+              {{ editingEquipeId ? 'Sauvegarder' : 'Créer l\'équipe' }}
+            </button>
+            <button 
+              type="button" 
+              class="btn btn-secondary"
+              (click)="annulerModificationEquipe()">
+              Annuler
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gestion des membres -->
+  <div class="members-section">
+    <div class="section-header">
+      <h3>Gestion des membres</h3>
+      <button class="btn btn-primary" (click)="isEditingMembre = true; isEditingEquipe = false">
+        + Nouveau membre
+      </button>
+    </div>
+
+    <!-- Formulaire de membre -->
+    <div class="form-section" *ngIf="isEditingMembre">
+      <div class="card">
+        <div class="card-header">
+          <h3>{{ editingMembreId ? 'Modifier le membre' : 'Nouveau membre' }}</h3>
+        </div>
+        <div class="card-body">
+          <form [formGroup]="membreForm" (ngSubmit)="editingMembreId ? sauvegarderMembre() : ajouterMembre()">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="nomMembre">Nom complet *</label>
+                <input 
+                  type="text" 
+                  id="nomMembre" 
+                  formControlName="nom" 
+                  class="form-control"
+                  placeholder="Nom complet">
+              </div>
+              <div class="form-group">
+                <label for="poste">Poste *</label>
+                <input 
+                  type="text" 
+                  id="poste" 
+                  formControlName="poste" 
+                  class="form-control"
+                  placeholder="Poste occupé">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="email">Email *</label>
+                <input 
+                  type="email" 
+                  id="email" 
+                  formControlName="email" 
+                  class="form-control"
+                  placeholder="email@exemple.com">
+              </div>
+              <div class="form-group">
+                <label for="telephone">Téléphone *</label>
+                <input 
+                  type="tel" 
+                  id="telephone" 
+                  formControlName="telephone" 
+                  class="form-control"
+                  placeholder="+33 1 23 45 67 89">
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="dateEmbauche">Date d'embauche *</label>
+                <input 
+                  type="date" 
+                  id="dateEmbauche" 
+                  formControlName="dateEmbauche" 
+                  class="form-control">
+              </div>
+              <div class="form-group">
+                <label for="equipeMembre">Équipe *</label>
+                <select id="equipeMembre" formControlName="equipe" class="form-control">
+                  <option value="">Sélectionner une équipe</option>
+                  <option *ngFor="let equipe of equipes" [value]="equipe.nom">
+                    {{ equipe.nom }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="statut">Statut *</label>
+              <select id="statut" formControlName="statut" class="form-control">
+                <option value="actif">Actif</option>
+                <option value="inactif">Inactif</option>
+                <option value="en congé">En congé</option>
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <button 
+                type="submit" 
+                class="btn btn-primary"
+                [disabled]="!membreForm.valid">
+                {{ editingMembreId ? 'Sauvegarder' : 'Ajouter le membre' }}
+              </button>
+              <button 
+                type="button" 
+                class="btn btn-secondary"
+                (click)="annulerModificationMembre()">
+                Annuler
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liste des membres -->
+    <div class="members-grid">
+      <div 
+        *ngFor="let membre of selectedEquipe ? getMembresEquipe(selectedEquipe) : membres" 
+        class="member-card"
+        [ngClass]="getPerformanceClass(membre.performance)">
+        <div class="member-header">
+          <h4>{{ membre.nom }}</h4>
+          <div class="member-actions">
+            <button 
+              class="btn-icon"
+              (click)="modifierMembre(membre)"
+              title="Modifier le membre">
+              ✏️
+            </button>
+            <button 
+              class="btn-icon"
+              (click)="supprimerMembre(membre.id)"
+              title="Supprimer le membre">
+              🗑️
+            </button>
+          </div>
+        </div>
+
+        <div class="member-content">
+          <div class="member-info">
+            <div class="info-item">
+              <span class="label">Poste:</span>
+              <span class="value">{{ membre.poste }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Équipe:</span>
+              <span class="value">{{ membre.equipe }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Email:</span>
+              <span class="value">{{ membre.email }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Téléphone:</span>
+              <span class="value">{{ membre.telephone }}</span>
+            </div>
+            <div class="info-item">
+              <span class="label">Embauché le:</span>
+              <span class="value">{{ membre.dateEmbauche | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+
+          <div class="performance-section">
+            <div class="performance-bar">
+              <div class="performance-fill" 
+                   [ngClass]="getPerformanceClass(membre.performance)"
+                   [style.width.%]="membre.performance">
+              </div>
+            </div>
+            <span class="performance-text">{{ membre.performance }}%</span>
+          </div>
+
+          <div class="member-status">
+            <span class="badge" [ngClass]="'statut-' + membre.statut">
+              {{ membre.statut }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="(selectedEquipe ? getMembresEquipe(selectedEquipe) : membres).length === 0" class="empty-state">
+      <div class="empty-icon">👥</div>
+      <h4>Aucun membre trouvé</h4>
+      <p>{{ selectedEquipe ? 'Cette équipe n\'a pas encore de membres.' : 'Commencez par ajouter des membres d\'équipe.' }}</p>
+    </div>
+  </div>
+</div>

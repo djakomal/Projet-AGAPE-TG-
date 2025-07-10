@@ -8,5 +8,29 @@
         <i class="bi me-2" [ngClass]="getIcon(i)"></i> {{ link.label }}
       </a>
     </li>
+    <!-- Bouton Actions & Indicateurs pour coordinateur -->
+    <li class="nav-item" *ngIf="userRole === 'coordinateur'">
+      <button class="nav-link d-flex align-items-center sidebar-link w-100 border-0 bg-transparent" (click)="toggleActionsPanel()">
+        <i class="bi bi-gear-wide-connected me-2"></i> Actions & Indicateurs
+      </button>
+    </li>
   </ul>
 </nav>
+
+<!-- Panneau latéral Actions & Indicateurs -->
+<div class="actions-panel-overlay" *ngIf="showActionsPanel" (click)="closeActionsPanel()"></div>
+<div class="actions-panel" [class.show]="showActionsPanel">
+  <div class="actions-panel-header">
+    <h5 class="mb-0">Actions & Indicateurs Coordinateur</h5>
+    <button class="btn-close" (click)="closeActionsPanel()">&times;</button>
+  </div>
+  <div class="actions-panel-content">
+    <!-- Debug -->
+    <div *ngIf="showActionsPanel" class="debug-info">
+      <p>Panneau ouvert: {{ showActionsPanel }}</p>
+      <p>Rôle utilisateur: {{ userRole }}</p>
+    </div>
+    <!-- Composant -->
+    <app-actions-indicateurs-coordinateur *ngIf="showActionsPanel"></app-actions-indicateurs-coordinateur>
+  </div>
+</div>

@@ -1,1 +1,217 @@
-<p>vue-ensemble works!</p>
+<div class="vue-ensemble">
+  <div class="header">
+    <h2>Vue d'Ensemble</h2>
+    <p>Tableau de bord complet de l'organisation</p>
+  </div>
+  <app-directives-chat></app-directives-chat>
+
+  <!-- Performance générale dynamique -->
+  <div class="performance-overview">
+    <div class="performance-card">
+      <div class="performance-header">
+        <h3>Performance Générale</h3>
+        <div class="performance-score">
+          <span class="score">{{ progression$ | async }}</span>
+          <span class="score-unit">%</span>
+        </div>
+      </div>
+      <div class="performance-bar">
+        <div class="performance-fill" [style.width.%]="(progression$ | async) || 0"></div>
+      </div>
+      <p class="performance-description">
+        Score global basé sur les performances réelles des secteurs social, médical et comptable
+      </p>
+      <div class="sector-stats" *ngIf="stats$ | async as stats">
+        <div class="sector-stat">
+          <i class="bi bi-people" style="color:#2c3e50;"></i>
+          Social : <strong>{{ stats.social }}%</strong>
+        </div>
+        <div class="sector-stat">
+          <i class="bi bi-heart-pulse" style="color:#2c3e50;"></i>
+          Médical : <strong>{{ stats.medical }}%</strong>
+        </div>
+        <div class="sector-stat">
+          <i class="bi bi-wallet2" style="color:#2c3e50;"></i>
+          Comptable : <strong>{{ stats.comptable }}%</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Statistiques principales -->
+  <div class="stats-section">
+    <h3>Statistiques Principales</h3>
+    <div class="stats-grid">
+      <div 
+        *ngFor="let stat of statistiques" 
+        class="stat-card"
+        [style.border-left-color]="stat.couleur">
+        <div class="stat-header">
+          <div class="stat-icon" [style.background-color]="stat.couleur">
+            {{ stat.icone }}
+          </div>
+          <div class="stat-info">
+            <h4>{{ stat.titre }}</h4>
+            <div class="stat-value">
+              <span class="value">{{ stat.valeur }}</span>
+              <span class="unit">{{ stat.unite }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="stat-variation">
+          <span 
+            class="variation" 
+            [ngClass]="getVariationClass(stat.variation)">
+            {{ stat.variation >= 0 ? '+' : '' }}{{ stat.variation }}%
+          </span>
+          <span class="variation-label">vs mois dernier</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div class="main-content">
+    <div class="content-grid">
+      <!-- Activités récentes -->
+      <div class="content-card">
+        <div class="card-header">
+          <h3>Activités Récentes</h3>
+          <button class="btn btn-outline">Voir tout</button>
+        </div>
+        <div class="activities-list">
+          <div 
+            *ngFor="let activite of activitesRecentes" 
+            class="activity-item"
+            [ngClass]="getStatutClass(activite.statut)">
+            <div class="activity-icon">
+              {{ getTypeIcon(activite.type) }}
+            </div>
+            <div class="activity-content">
+              <h4>{{ activite.titre }}</h4>
+              <p>{{ activite.description }}</p>
+              <div class="activity-meta">
+                <span class="activity-date">
+                  {{ formaterDate(activite.date) }} à {{ formaterHeure(activite.date) }}
+                </span>
+                <span class="activity-status" [ngClass]="getStatutClass(activite.statut)">
+                  {{ activite.statut === 'termine' ? 'Terminé' : 
+                     activite.statut === 'en_cours' ? 'En cours' : 'En attente' }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Projets en cours -->
+      <div class="content-card">
+        <div class="card-header">
+          <h3>Projets en Cours</h3>
+          <button class="btn btn-outline">Gérer</button>
+        </div>
+        <div class="projects-list">
+          <div 
+            *ngFor="let projet of projetsEnCours" 
+            class="project-item">
+            <div class="project-header">
+              <h4>{{ projet.nom }}</h4>
+              <span class="project-team">{{ projet.equipe }}</span>
+            </div>
+            
+            <div class="project-progress">
+              <div class="progress-info">
+                <span class="progress-label">Progression</span>
+                <span class="progress-value">{{ projet.progression }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div 
+                  class="progress-fill" 
+                  [ngClass]="getProgressionClass(projet.progression)"
+                  [style.width.%]="projet.progression">
+                </div>
+              </div>
+            </div>
+
+            <div class="project-dates">
+              <div class="date-info">
+                <span class="date-label">Début:</span>
+                <span class="date-value">{{ formaterDate(projet.dateDebut) }}</span>
+              </div>
+              <div class="date-info">
+                <span class="date-label">Fin:</span>
+                <span class="date-value">{{ formaterDate(projet.dateFin) }}</span>
+              </div>
+              <div class="date-info">
+                <span class="date-label">Reste:</span>
+                <span class="date-value" [ngClass]="getJoursRestants(projet.dateFin) < 7 ? 'urgent' : ''">
+                  {{ getJoursRestants(projet.dateFin) }} jours
+                </span>
+              </div>
+            </div>
+
+            <div class="project-status">
+              <span class="status-badge" [ngClass]="getStatutClass(projet.statut)">
+                {{ projet.statut === 'a_jour' ? 'À jour' : 
+                   projet.statut === 'en_retard' ? 'En retard' : 'En cours' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Résumé rapide -->
+  <div class="quick-summary">
+    <div class="summary-grid">
+      <div class="summary-card">
+        <div class="summary-icon">🎯</div>
+        <div class="summary-content">
+          <h4>Objectifs atteints</h4>
+          <p>85% des objectifs trimestriels ont été atteints</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-icon">📈</div>
+        <div class="summary-content">
+          <h4>Croissance</h4>
+          <p>12% d'augmentation de l'efficacité des équipes</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-icon">🤝</div>
+        <div class="summary-content">
+          <h4>Collaboration</h4>
+          <p>8 nouvelles collaborations établies ce mois</p>
+        </div>
+      </div>
+      
+      <div class="summary-card">
+        <div class="summary-icon">💡</div>
+        <div class="summary-content">
+          <h4>Innovation</h4>
+          <p>3 nouveaux projets innovants lancés</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confirmation Dialog -->
+  <div class="confirm-dialog-backdrop" *ngIf="confirmDialog">
+    <div class="confirm-dialog">
+      <h5>Confirmation</h5>
+      <p>
+        Voulez-vous vraiment
+        <strong>{{ confirmDialog.type === 'relancer' ? 'relancer' : 'valider' }}</strong>
+        le secteur <strong>{{ getSecteurLabel(confirmDialog.secteur) }}</strong> ?
+      </p>
+      <div class="d-flex justify-content-end gap-2">
+        <button class="btn btn-secondary btn-sm" (click)="cancelAction()">Annuler</button>
+        <button class="btn btn-primary btn-sm" (click)="confirmAction()">Confirmer</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -20,6 +20,13 @@ import { GestionFinanciereComponent } from './components/comptable/gestion-finan
 import { ValidationDepensesComponent } from './components/comptable/validation-depenses/validation-depenses.component';
 import { RapportsFinanciersComponent } from './components/comptable/rapports-financiers/rapports-financiers.component';
 
+// Imports coordinateur (standalone)
+import { VueEnsembleComponent } from './components/coordinateur/vue-ensemble/vue-ensemble.component';
+import { GestionAdministrativeComponent } from './components/coordinateur/gestion-administrative/gestion-administrative.component';
+import { SuiviEquipesComponent } from './components/coordinateur/suivi-equipes/suivi-equipes.component';
+import { ChatInboxComponent } from './components/common/chat-inbox.component';
+import { ActionsIndicateursCoordinateurComponent } from './components/coordinateur/actions-indicateurs/actions-indicateurs.component';
+
 import { AuthGuard } from './guards/auth.guard';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 
@@ -47,7 +54,16 @@ export const routes: Routes = [
       { path: 'gestion-financiere', component: GestionFinanciereComponent },
       { path: 'validation-depenses', component: ValidationDepensesComponent },
       { path: 'rapports-financiers', component: RapportsFinanciersComponent },
-      
+
+      // Routes coordinateur
+      { path: 'vue-ensemble', component: VueEnsembleComponent },
+      { path: 'gestion-administrative', component: GestionAdministrativeComponent },
+      { path: 'suivi-equipes', component: SuiviEquipesComponent },
+      { path: 'actions-coordinateur', component: ActionsIndicateursCoordinateurComponent },
+
+      // Inbox directives
+      { path: 'inbox', component: ChatInboxComponent },
+
       { path: '', redirectTo: 'scolarite', pathMatch: 'full' }
     ]
   },

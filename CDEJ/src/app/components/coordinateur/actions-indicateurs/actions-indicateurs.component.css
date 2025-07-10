@@ -1,0 +1,53 @@
+.actions-section, .indicateurs-section {
+  margin-bottom: 2rem;
+}
+.actions-grid, .indicateurs-grid {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+.action-card, .indicateur-card {
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+  padding: 1rem;
+  min-width: 220px;
+  flex: 1 1 220px;
+}
+.action-header, .indicateur-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+.action-icon {
+  font-size: 1.5rem;
+}
+.action-buttons button {
+  margin-right: 0.5rem;
+}
+.confirm-dialog-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+.confirm-dialog {
+  background: #fff;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.12);
+  min-width: 320px;
+}
+.indicateur-value input,
+.indicateur-commentaire input {
+  margin-bottom: 0.5rem;
+}
+.indicateur-historique ul {
+  padding-left: 1.2rem;
+  font-size: 0.95em;
+} 

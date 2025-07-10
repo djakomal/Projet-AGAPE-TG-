@@ -1,0 +1,82 @@
+.chat-inbox {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.07);
+  padding: 24px;
+  max-width: 600px;
+  margin: 0 auto 32px auto;
+}
+
+.chat-inbox h3 {
+  margin-top: 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  margin-bottom: 18px;
+}
+
+.empty-inbox {
+  color: #95a5a6;
+  text-align: center;
+  margin: 32px 0;
+}
+
+.inbox-message {
+  border-bottom: 1px solid #f1f3f4;
+  padding: 14px 0;
+  opacity: 0;
+  transform: translateY(20px);
+  animation: fadeInSlide 0.5s forwards;
+}
+
+@keyframes fadeInSlide {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.inbox-message.new {
+  background: #f6e9ff;
+  animation: highlightNew 1.2s;
+}
+
+@keyframes highlightNew {
+  0% { background: #f6e9ff; }
+  80% { background: #f6e9ff; }
+  100% { background: transparent; }
+}
+
+.inbox-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.98rem;
+  margin-bottom: 4px;
+}
+
+.inbox-author {
+  font-weight: 600;
+  color: #764ba2;
+}
+
+.inbox-date {
+  color: #95a5a6;
+  font-size: 0.95em;
+}
+
+.inbox-content {
+  color: #2c3e50;
+  margin-bottom: 4px;
+}
+
+.inbox-destinataires {
+  color: #7f8c8d;
+  font-size: 0.92em;
+}
+
+/* Scroll automatique */
+.chat-inbox .inbox-history {
+  max-height: 320px;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+} 

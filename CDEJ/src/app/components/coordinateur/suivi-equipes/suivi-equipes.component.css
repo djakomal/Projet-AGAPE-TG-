@@ -1,0 +1,467 @@
+.suivi-equipes {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.header h2 {
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-size: 2.2rem;
+}
+
+.header p {
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}
+
+/* Sections */
+.overview-section,
+.members-section {
+  margin-bottom: 40px;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.section-header h3 {
+  color: #2c3e50;
+  font-size: 1.4rem;
+  margin: 0;
+}
+
+/* Grille des équipes */
+.teams-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 25px;
+}
+
+.team-card {
+  background: white;
+  border: 2px solid #e1e8ed;
+  border-radius: 12px;
+  padding: 25px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.team-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.team-card.statut-excellent {
+  border-left: 4px solid #27ae60;
+}
+
+.team-card.statut-bon {
+  border-left: 4px solid #3498db;
+}
+
+.team-card.statut-moyen {
+  border-left: 4px solid #f39c12;
+}
+
+.team-card.statut-ameliorer {
+  border-left: 4px solid #e74c3c;
+}
+
+.team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+}
+
+.team-header h4 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.3rem;
+  flex: 1;
+  margin-right: 15px;
+}
+
+.team-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-icon:hover {
+  background: #f8f9fa;
+}
+
+.team-content {
+  color: #34495e;
+}
+
+.team-info {
+  margin-bottom: 20px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  font-size: 0.95rem;
+}
+
+.info-item .label {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.info-item .value {
+  color: #7f8c8d;
+}
+
+/* Barre de performance */
+.performance-section {
+  margin-bottom: 20px;
+}
+
+.performance-bar {
+  width: 100%;
+  height: 8px;
+  background: #ecf0f1;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.performance-fill {
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.performance-fill.performance-excellente {
+  background: linear-gradient(90deg, #27ae60, #2ecc71);
+}
+
+.performance-fill.performance-bonne {
+  background: linear-gradient(90deg, #3498db, #5dade2);
+}
+
+.performance-fill.performance-moyenne {
+  background: linear-gradient(90deg, #f39c12, #f7dc6f);
+}
+
+.performance-fill.performance-faible {
+  background: linear-gradient(90deg, #e74c3c, #ec7063);
+}
+
+.performance-text {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+/* Badges */
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  display: inline-block;
+}
+
+.badge.statut-excellent {
+  background: #d5f4e6;
+  color: #27ae60;
+}
+
+.badge.statut-bon {
+  background: #d6eaf8;
+  color: #3498db;
+}
+
+.badge.statut-moyen {
+  background: #fef9e7;
+  color: #f39c12;
+}
+
+.badge.statut-ameliorer {
+  background: #fdf2f2;
+  color: #e74c3c;
+}
+
+.badge.statut-actif {
+  background: #d5f4e6;
+  color: #27ae60;
+}
+
+.badge.statut-inactif {
+  background: #fdf2f2;
+  color: #e74c3c;
+}
+
+.badge.statut-en-congé {
+  background: #fef9e7;
+  color: #f39c12;
+}
+
+.team-status {
+  margin-bottom: 15px;
+}
+
+/* Boutons */
+.btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  background: #95a5a6;
+  color: white;
+}
+
+.btn-secondary:hover {
+  background: #7f8c8d;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid #667eea;
+  color: #667eea;
+  width: 100%;
+}
+
+.btn-outline:hover {
+  background: #667eea;
+  color: white;
+}
+
+/* Formulaire */
+.form-section {
+  margin-bottom: 30px;
+}
+
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+.card-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+}
+
+.card-header h3 {
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.card-body {
+  padding: 25px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e1e8ed;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+  margin-top: 25px;
+}
+
+/* Grille des membres */
+.members-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 20px;
+}
+
+.member-card {
+  background: white;
+  border: 2px solid #e1e8ed;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.member-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.member-card.performance-excellente {
+  border-left: 4px solid #27ae60;
+}
+
+.member-card.performance-bonne {
+  border-left: 4px solid #3498db;
+}
+
+.member-card.performance-moyenne {
+  border-left: 4px solid #f39c12;
+}
+
+.member-card.performance-faible {
+  border-left: 4px solid #e74c3c;
+}
+
+.member-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 15px;
+}
+
+.member-header h4 {
+  margin: 0;
+  color: #2c3e50;
+  font-size: 1.2rem;
+  flex: 1;
+  margin-right: 15px;
+}
+
+.member-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.member-content {
+  color: #34495e;
+}
+
+.member-info {
+  margin-bottom: 15px;
+}
+
+.member-status {
+  margin-bottom: 15px;
+}
+
+/* État vide */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #7f8c8d;
+}
+
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.empty-state h4 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 1.3rem;
+}
+
+.empty-state p {
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .suivi-equipes {
+    padding: 15px;
+  }
+  
+  .teams-grid,
+  .members-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    width: 100%;
+  }
+  
+  .team-card,
+  .member-card {
+    padding: 15px;
+  }
+}

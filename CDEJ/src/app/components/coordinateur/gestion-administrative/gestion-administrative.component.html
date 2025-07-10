@@ -1,1 +1,294 @@
-<p>gestion-administrative works!</p>
+<div class="gestion-administrative">
+  <!-- Header moderne -->
+  <div class="header-section">
+    <div class="header-content">
+      <div class="header-icon">
+        <i class="bi bi-gear-wide-connected"></i>
+      </div>
+      <div class="header-text">
+        <h1>Gestion Administrative</h1>
+        <p>Gérez efficacement les tâches et procédures administratives</p>
+      </div>
+    </div>
+    <div class="header-stats">
+      <div class="stat-card">
+        <i class="bi bi-list-task"></i>
+        <div class="stat-info">
+          <span class="stat-number">{{ taches.length }}</span>
+          <span class="stat-label">Tâches totales</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="bi bi-clock"></i>
+        <div class="stat-info">
+          <span class="stat-number">{{ getTachesEnCours() }}</span>
+          <span class="stat-label">En cours</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <i class="bi bi-check-circle"></i>
+        <div class="stat-info">
+          <span class="stat-number">{{ getTachesTerminees() }}</span>
+          <span class="stat-label">Terminées</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Formulaire amélioré -->
+  <div class="form-section" [class.collapsed]="!showForm">
+    <div class="form-card">
+      <div class="form-header">
+        <div class="form-title">
+          <i class="bi bi-plus-circle"></i>
+          <h3>{{ isEditing ? 'Modifier la tâche' : 'Nouvelle tâche administrative' }}</h3>
+        </div>
+        <button class="btn-toggle" (click)="toggleForm()">
+          <i class="bi" [ngClass]="showForm ? 'bi-chevron-up' : 'bi-chevron-down'"></i>
+        </button>
+      </div>
+      
+      <div class="form-content" [class.show]="showForm">
+        <form [formGroup]="tacheForm" (ngSubmit)="isEditing ? sauvegarderModification() : ajouterTache()">
+          <div class="form-grid">
+            <div class="form-group">
+              <label for="titre">
+                <i class="bi bi-type"></i>
+                Titre de la tâche *
+              </label>
+              <input 
+                type="text" 
+                id="titre" 
+                formControlName="titre" 
+                class="form-control"
+                placeholder="Ex: Révision du budget trimestriel"
+                [class.error]="tacheForm.get('titre')?.invalid && tacheForm.get('titre')?.touched">
+              <div class="error-message" *ngIf="tacheForm.get('titre')?.invalid && tacheForm.get('titre')?.touched">
+                Le titre est requis
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="assigne">
+                <i class="bi bi-person"></i>
+                Assigné à *
+              </label>
+              <select 
+                id="assigne" 
+                formControlName="assigne" 
+                class="form-control"
+                [class.error]="tacheForm.get('assigne')?.invalid && tacheForm.get('assigne')?.touched">
+                <option value="">Sélectionner un secteur</option>
+                <option *ngFor="let secteur of secteurs" [value]="secteur.value">
+                  {{ secteur.label }}
+                </option>
+              </select>
+              <div class="error-message" *ngIf="tacheForm.get('assigne')?.invalid && tacheForm.get('assigne')?.touched">
+                L'assignation est requise
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="priorite">
+                <i class="bi bi-flag"></i>
+                Priorité *
+              </label>
+              <select id="priorite" formControlName="priorite" class="form-control">
+                <option value="">Sélectionner une priorité</option>
+                <option value="basse">🟢 Basse</option>
+                <option value="moyenne">🟡 Moyenne</option>
+                <option value="haute">🔴 Haute</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label for="dateEcheance">
+                <i class="bi bi-calendar-event"></i>
+                Date d'échéance *
+              </label>
+              <input 
+                type="date" 
+                id="dateEcheance" 
+                formControlName="dateEcheance" 
+                class="form-control"
+                [class.error]="tacheForm.get('dateEcheance')?.invalid && tacheForm.get('dateEcheance')?.touched">
+            </div>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="description">
+              <i class="bi bi-text-paragraph"></i>
+              Description détaillée *
+            </label>
+            <textarea 
+              id="description" 
+              formControlName="description" 
+              class="form-control"
+              rows="4"
+              placeholder="Décrivez les détails de la tâche, les objectifs et les étapes à suivre..."
+              [class.error]="tacheForm.get('description')?.invalid && tacheForm.get('description')?.touched"></textarea>
+            <div class="error-message" *ngIf="tacheForm.get('description')?.invalid && tacheForm.get('description')?.touched">
+              La description est requise
+            </div>
+          </div>
+
+          <div class="form-actions">
+            <button 
+              type="button" 
+              class="btn btn-outline-secondary"
+              (click)="annulerModification()"
+              *ngIf="isEditing">
+              <i class="bi bi-x-circle"></i>
+              Annuler
+            </button>
+            <button 
+              type="submit" 
+              class="btn btn-primary"
+              [disabled]="!tacheForm.valid || isSubmitting">
+              <i class="bi" [ngClass]="isEditing ? 'bi-check-circle' : 'bi-plus-circle'"></i>
+              <span *ngIf="!isSubmitting">
+                {{ isEditing ? 'Sauvegarder' : 'Créer la tâche' }}
+              </span>
+              <span *ngIf="isSubmitting">
+                <i class="bi bi-arrow-clockwise spin"></i>
+                Enregistrement...
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filtres et recherche -->
+  <div class="filters-section">
+    <div class="filters-card">
+      <div class="search-box">
+        <i class="bi bi-search"></i>
+        <input 
+          type="text" 
+          placeholder="Rechercher une tâche..."
+          [(ngModel)]="searchTerm"
+          class="search-input">
+      </div>
+      
+      <div class="filters-group">
+        <select class="filter-select" [(ngModel)]="statusFilter">
+          <option value="">Tous les statuts</option>
+          <option value="à faire">⏳ À faire</option>
+          <option value="en cours">🔄 En cours</option>
+          <option value="terminée">✅ Terminée</option>
+        </select>
+        
+        <select class="filter-select" [(ngModel)]="priorityFilter">
+          <option value="">Toutes les priorités</option>
+          <option value="haute">🔴 Haute</option>
+          <option value="moyenne">🟡 Moyenne</option>
+          <option value="basse">🟢 Basse</option>
+        </select>
+        
+        <button class="btn btn-outline-primary btn-sm" (click)="clearFilters()">
+          <i class="bi bi-arrow-clockwise"></i>
+          Réinitialiser
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Liste des tâches améliorée -->
+  <div class="tasks-section">
+    <div class="tasks-header">
+      <h3>
+        <i class="bi bi-list-ul"></i>
+        Tâches administratives
+        <span class="tasks-count">({{ getFilteredTaches().length }})</span>
+      </h3>
+    </div>
+
+    <div class="tasks-grid" *ngIf="getFilteredTaches().length > 0">
+      <div 
+        *ngFor="let tache of getFilteredTaches(); trackBy: trackByTacheId" 
+        class="task-card"
+        [ngClass]="getTaskCardClasses(tache)"
+        [@taskAnimation]>
+        <div class="task-header">
+          <div class="task-title">
+            <h4>{{ tache.titre }}</h4>
+            <div class="task-badges">
+              <span class="badge priority-badge" [ngClass]="'priority-' + tache.priorite">
+                {{ tache.priorite }}
+              </span>
+              <span class="badge status-badge" [ngClass]="'status-' + tache.statut">
+                {{ tache.statut }}
+              </span>
+            </div>
+          </div>
+          <div class="task-actions">
+            <button 
+              class="btn-action"
+              (click)="modifierTache(tache)"
+              title="Modifier">
+              <i class="bi bi-pencil"></i>
+            </button>
+            <button 
+              class="btn-action btn-danger"
+              (click)="supprimerTache(tache.id)"
+              title="Supprimer">
+              <i class="bi bi-trash"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="task-content">
+          <p class="task-description">{{ tache.description }}</p>
+          
+          <div class="task-meta">
+            <div class="meta-item">
+              <i class="bi bi-person"></i>
+              <span class="meta-label">Assigné à:</span>
+              <span class="meta-value">{{ getSecteurLabel(tache.assigne) }}</span>
+            </div>
+            <div class="meta-item">
+              <i class="bi bi-calendar"></i>
+              <span class="meta-label">Échéance:</span>
+              <span class="meta-value" [ngClass]="getEcheanceClass(tache.dateEcheance)">
+                {{ tache.dateEcheance | date:'dd/MM/yyyy' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="task-status-control">
+            <label>Statut:</label>
+            <select 
+              class="status-select"
+              [ngClass]="'status-' + tache.statut"
+              (change)="onStatutChange(tache, $event)">
+              <option value="à faire" [selected]="tache.statut === 'à faire'">⏳ À faire</option>
+              <option value="en cours" [selected]="tache.statut === 'en cours'">🔄 En cours</option>
+              <option value="terminée" [selected]="tache.statut === 'terminée'">✅ Terminée</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- État vide amélioré -->
+    <div *ngIf="getFilteredTaches().length === 0" class="empty-state">
+      <div class="empty-icon">
+        <i class="bi bi-inbox"></i>
+      </div>
+      <h4>Aucune tâche trouvée</h4>
+      <p *ngIf="searchTerm || statusFilter || priorityFilter">
+        Aucune tâche ne correspond à vos critères de recherche.
+        <button class="btn btn-link" (click)="clearFilters()">Effacer les filtres</button>
+      </p>
+      <p *ngIf="!searchTerm && !statusFilter && !priorityFilter">
+        Commencez par créer votre première tâche administrative.
+      </p>
+      <button class="btn btn-primary" (click)="showForm = true">
+        <i class="bi bi-plus-circle"></i>
+        Créer une tâche
+      </button>
+    </div>
+  </div>
+</div>
