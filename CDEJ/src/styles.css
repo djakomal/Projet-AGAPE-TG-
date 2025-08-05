@@ -1,6 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
 
-/* @import 'bootstrap/css/bootstrap'; */
+/* @import 'bootstrap/dist/css/bootstrap.min.css'; */
+/* Bootstrap est déjà importé dans angular.json */
 
 /* Variables de couleurs uniformes - Thème Bleu et Blanc */
 :root {
