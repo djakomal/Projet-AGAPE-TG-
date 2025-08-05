@@ -301,22 +301,11 @@ export class DossierMedicalMockService {
     this.paiements.push(paiement);
   }
 
-  updatePaiement(id: string, paiement: Partial<PaiementMedical>): void {
-    const idx = this.paiements.findIndex(p => p.id === id);
-    if (idx !== -1) {
-      this.paiements[idx] = { ...this.paiements[idx], ...paiement };
-    }
-  }
-
   updatePaiementMedical(id: string, paiement: Partial<PaiementMedical>): void {
     const idx = this.paiements.findIndex(p => p.id === id);
     if (idx !== -1) {
       this.paiements[idx] = { ...this.paiements[idx], ...paiement };
     }
-  }
-
-  deletePaiement(id: string): void {
-    this.paiements = this.paiements.filter(p => p.id !== id);
   }
 
   deletePaiementMedical(id: string): void {
