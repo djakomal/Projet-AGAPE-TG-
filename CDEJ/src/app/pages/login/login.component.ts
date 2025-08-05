@@ -25,9 +25,17 @@ export class LoginComponent {
   resendMessage = '';
   resendSuccess = false;
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private auth: AuthService, private router: Router) {
+    console.log('🔑 LoginComponent - Constructor appelé');
+  }
+
+  ngOnInit() {
+    console.log('🟢 LoginComponent - ngOnInit appelé');
+  }
 
   onSubmit() {
+    console.log('📝 LoginComponent - onSubmit appelé avec email:', this.email);
+    
     if (!this.email || !this.password) {
       this.error = 'Veuillez remplir tous les champs';
       return;

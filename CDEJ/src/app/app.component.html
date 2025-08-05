@@ -1,1 +1,20 @@
+<!-- Debug: Test de visibilité -->
+<div id="app-debug" style="background: #f0f0f0; padding: 10px; border: 1px solid #ccc; margin: 10px;">
+  <h4>🔧 Debug CDEJ</h4>
+  <p>✅ Angular chargé - {{ title }}</p>
+  <p>📍 URL: <span id="current-url">{{ getCurrentUrl() }}</span></p>
+  <button (click)="navigateToLogin()" style="background: blue; color: white; padding: 5px 10px; border: none; cursor: pointer;">
+    🔑 Aller à Login
+  </button>
+</div>
+
 <router-outlet></router-outlet>
+
+<!-- Fallback si router ne marche pas -->
+<div *ngIf="showFallback" style="background: #fff3cd; padding: 20px; margin: 10px; border: 1px solid #ffeaa7;">
+  <h3>⚠️ Problème de Navigation Détecté</h3>
+  <p>Le système de navigation ne fonctionne pas correctement.</p>
+  <button (click)="forceLogin()" style="background: #007bff; color: white; padding: 10px; border: none; cursor: pointer;">
+    🔧 Forcer l'accès Login
+  </button>
+</div>
